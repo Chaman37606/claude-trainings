@@ -1,0 +1,446 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MCP Search Engine</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #2563eb;
+            --primary-dark: #1e40af;
+            --success: #16a34a;
+            --danger: #dc2626;
+            --neutral-50: #f9fafb;
+            --neutral-100: #f3f4f6;
+            --neutral-200: #e5e7eb;
+            --neutral-600: #4b5563;
+            --neutral-800: #1f2937;
+            --neutral-900: #111827;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
+        }
+
+        .container {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            max-width: 800px;
+            width: 100%;
+            padding: 3rem;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .logo {
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .title {
+            font-size: 2rem;
+            color: var(--neutral-900);
+            margin-bottom: 0.5rem;
+        }
+
+        .subtitle {
+            color: var(--neutral-600);
+            font-size: 1rem;
+        }
+
+        .search-box {
+            display: flex;
+            gap: 0.75rem;
+            margin-bottom: 2rem;
+        }
+
+        .search-input {
+            flex: 1;
+            padding: 1rem;
+            font-size: 1rem;
+            border: 2px solid var(--neutral-200);
+            border-radius: 8px;
+            transition: border-color 0.3s;
+        }
+
+        .search-input:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+        }
+
+        .search-btn {
+            padding: 1rem 2rem;
+            background: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+
+        .search-btn:hover {
+            background: var(--primary-dark);
+        }
+
+        .search-btn:disabled {
+            background: var(--neutral-600);
+            cursor: not-allowed;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 2rem;
+            color: var(--neutral-600);
+        }
+
+        .spinner {
+            display: inline-block;
+            width: 30px;
+            height: 30px;
+            border: 4px solid var(--neutral-200);
+            border-top: 4px solid var(--primary);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .error {
+            background: #fee2e2;
+            color: var(--danger);
+            padding: 1rem;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+            border-left: 4px solid var(--danger);
+        }
+
+        .results {
+            margin-top: 2rem;
+        }
+
+        .result-header {
+            font-size: 1.5rem;
+            color: var(--neutral-900);
+            margin-bottom: 1rem;
+            font-weight: 600;
+        }
+
+        .result-item {
+            background: var(--neutral-50);
+            padding: 1.5rem;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+            border-left: 4px solid var(--primary);
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .result-item:hover {
+            transform: translateX(4px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        .result-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: var(--primary);
+            margin-bottom: 0.5rem;
+        }
+
+        .result-url {
+            font-size: 0.875rem;
+            color: var(--neutral-600);
+            margin-bottom: 0.75rem;
+            word-break: break-all;
+        }
+
+        .result-description {
+            font-size: 0.95rem;
+            color: var(--neutral-800);
+            line-height: 1.5;
+            margin-bottom: 0.75rem;
+        }
+
+        .result-source {
+            font-size: 0.75rem;
+            color: var(--neutral-600);
+            background: white;
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            border-radius: 4px;
+        }
+
+        .stats {
+            margin-top: 1.5rem;
+            padding-top: 1.5rem;
+            border-top: 1px solid var(--neutral-200);
+            font-size: 0.875rem;
+            color: var(--neutral-600);
+        }
+
+        .empty {
+            text-align: center;
+            padding: 2rem;
+            color: var(--neutral-600);
+        }
+
+        .extract-section {
+            margin-top: 2rem;
+            padding-top: 2rem;
+            border-top: 2px solid var(--neutral-200);
+        }
+
+        .extract-title {
+            font-size: 1.25rem;
+            color: var(--neutral-900);
+            margin-bottom: 1rem;
+            font-weight: 600;
+        }
+
+        .extract-box {
+            display: flex;
+            gap: 0.75rem;
+            margin-bottom: 1rem;
+        }
+
+        .extract-input {
+            flex: 1;
+            padding: 0.75rem;
+            font-size: 0.9rem;
+            border: 2px solid var(--neutral-200);
+            border-radius: 8px;
+        }
+
+        .extract-btn {
+            padding: 0.75rem 1.5rem;
+            background: var(--success);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+
+        .extract-btn:hover {
+            background: #15803d;
+        }
+
+        .extract-result {
+            background: #f0fdf4;
+            padding: 1rem;
+            border-radius: 8px;
+            border-left: 4px solid var(--success);
+            font-size: 0.875rem;
+            word-break: break-all;
+        }
+
+        @media (max-width: 600px) {
+            .container {
+                padding: 1.5rem;
+            }
+
+            .title {
+                font-size: 1.5rem;
+            }
+
+            .search-box {
+                flex-direction: column;
+            }
+
+            .search-btn {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="logo">🔍</div>
+            <h1 class="title">MCP Search Engine</h1>
+            <p class="subtitle">Powered by Model Context Protocol</p>
+        </div>
+
+        <div class="search-box">
+            <input
+                type="text"
+                id="searchInput"
+                class="search-input"
+                placeholder="Search the web..."
+                onkeypress="if(event.key==='Enter') search()"
+            >
+            <button class="search-btn" onclick="search()" id="searchBtn">Search</button>
+        </div>
+
+        <div id="error" class="error" style="display: none;"></div>
+        <div id="loading" class="loading" style="display: none;">
+            <div class="spinner"></div>
+            <p style="margin-top: 1rem;">Searching...</p>
+        </div>
+
+        <div id="results" class="results" style="display: none;">
+            <div class="result-header">Search Results</div>
+            <div id="resultsList"></div>
+            <div class="stats">
+                Found <span id="resultCount">0</span> results in <span id="searchTime">0</span>ms
+            </div>
+        </div>
+
+        <div id="empty" class="empty" style="display: none;">
+            Enter a search query to begin
+        </div>
+
+        <div class="extract-section">
+            <h2 class="extract-title">📄 Extract Content from URL</h2>
+            <div class="extract-box">
+                <input
+                    type="text"
+                    id="extractInput"
+                    class="extract-input"
+                    placeholder="Paste URL here..."
+                >
+                <button class="extract-btn" onclick="extractContent()">Extract</button>
+            </div>
+            <div id="extractResult"></div>
+        </div>
+    </div>
+
+    <script>
+        const API_URL = 'http://localhost:3001';
+
+        async function search() {
+            const query = document.getElementById('searchInput').value.trim();
+            if (!query) {
+                showError('Please enter a search query');
+                return;
+            }
+
+            showLoading(true);
+            hideError();
+
+            const startTime = performance.now();
+
+            try {
+                const response = await fetch(`${API_URL}/mcp/search`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ query })
+                });
+
+                if (!response.ok) throw new Error(`HTTP ${response.status}`);
+                const data = await response.json();
+
+                const endTime = performance.now();
+                displayResults(data, endTime - startTime);
+            } catch (error) {
+                showError(`Failed to search: ${error instanceof Error ? error.message : 'Unknown error'}`);
+            } finally {
+                showLoading(false);
+            }
+        }
+
+        function displayResults(data, time) {
+            if (data.results.length === 0) {
+                document.getElementById('empty').style.display = 'block';
+                document.getElementById('results').style.display = 'none';
+                return;
+            }
+
+            const resultsList = document.getElementById('resultsList');
+            resultsList.innerHTML = data.results.map(r => `
+                <div class="result-item">
+                    <div class="result-title">${escapeHtml(r.title)}</div>
+                    <div class="result-url"><strong>URL:</strong> <a href="${r.url}" target="_blank">${r.url}</a></div>
+                    <div class="result-description">${escapeHtml(r.description)}</div>
+                    <span class="result-source">${r.source}</span>
+                </div>
+            `).join('');
+
+            document.getElementById('resultCount').textContent = data.total;
+            document.getElementById('searchTime').textContent = Math.round(time);
+            document.getElementById('empty').style.display = 'none';
+            document.getElementById('results').style.display = 'block';
+        }
+
+        async function extractContent() {
+            const url = document.getElementById('extractInput').value.trim();
+            if (!url) {
+                showError('Please enter a URL');
+                return;
+            }
+
+            try {
+                const response = await fetch(`${API_URL}/mcp/extract`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ url })
+                });
+
+                const data = await response.json();
+
+                if (!response.ok) {
+                    showError(`Extraction failed: ${data.error}`);
+                    return;
+                }
+
+                document.getElementById('extractResult').innerHTML = `
+                    <div class="extract-result">
+                        <strong>URL:</strong> ${data.url}<br>
+                        <strong>Status:</strong> ${data.status}<br>
+                        <strong>Content Type:</strong> ${data.contentType}<br>
+                        <strong>Size:</strong> ${(data.contentLength / 1024).toFixed(2)} KB<br>
+                        <strong>Preview:</strong><br>
+                        <pre style="background: white; padding: 1rem; border-radius: 4px; margin-top: 0.5rem; overflow-x: auto;">${escapeHtml(data.excerpt)}</pre>
+                    </div>
+                `;
+            } catch (error) {
+                showError(`Failed to extract: ${error instanceof Error ? error.message : 'Unknown error'}`);
+            }
+        }
+
+        function showError(message) {
+            const errorDiv = document.getElementById('error');
+            errorDiv.textContent = message;
+            errorDiv.style.display = 'block';
+        }
+
+        function hideError() {
+            document.getElementById('error').style.display = 'none';
+        }
+
+        function showLoading(show) {
+            document.getElementById('loading').style.display = show ? 'block' : 'none';
+            document.getElementById('searchBtn').disabled = show;
+        }
+
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        // Initialize
+        document.getElementById('empty').style.display = 'block';
+    </script>
+</body>
+</html>
