@@ -77,6 +77,10 @@ class DataProcessor:
         # Read Excel
         df = pd.read_excel(file_path)
 
+        # Check if file is empty
+        if len(df) == 0:
+            raise ValueError("File contains no data rows. Please upload a file with shipment data.")
+
         # Rename columns to lowercase and strip whitespace
         df.columns = df.columns.str.lower().str.strip()
 

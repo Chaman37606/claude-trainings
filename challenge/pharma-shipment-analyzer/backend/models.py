@@ -52,13 +52,24 @@ class RiskCalculator:
     def calculate_delivery_delay(delivery_date: str, expected_days: int = 7) -> float:
         """Calculate delivery delay impact (0-100)."""
         try:
-            delivery = datetime.strptime(delivery_date, "%Y-%m-%d")
-            days_delayed = max(0, (datetime.now() - delivery).days - expected_days)
+            # Try multiple date formats
+            date_formats = ["%Y-%m-%d", "%m/%d/%Y", "%d/%m/%Y", "%Y/%m/%d"]
+            delivery = None
 
-            # Scale: each day late = 15 points
+            for fmt in date_formats:
+                try:
+                    delivery = datetime.strptime(str(delivery_date).strip(), fmt)
+                    break
+                except ValueError:
+                    continue
+
+            if delivery is None:
+                return 0.0
+
+            days_delayed = max(0, (datetime.now() - delivery).days - expected_days)
             impact = min(100, days_delayed * 15)
             return impact
-        except:
+        except Exception as e:
             return 0.0
 
     @staticmethod
@@ -175,12 +186,29 @@ def analyze_shipments(df) -> Dict[str, Any]:
         if risk_level == "HIGH" or risk_level == "CRITICAL":
             high_risk_count += 1
 
+        # Calculate delivery delay safely
+        try:
+            if delivery_date and str(delivery_date).strip() != 'nan':
+                date_formats = ["%Y-%m-%d", "%m/%d/%Y", "%d/%m/%Y", "%Y/%m/%d"]
+                delivery_dt = None
+                for fmt in date_formats:
+                    try:
+                        delivery_dt = datetime.strptime(str(delivery_date).strip(), fmt)
+                        break
+                    except ValueError:
+                        continue
+                delivery_delay = max(0, (datetime.now() - delivery_dt).days - 7) if delivery_dt else 0
+            else:
+                delivery_delay = 0
+        except:
+            delivery_delay = 0
+
         shipment = ShipmentRisk(
             shipment_id=shipment_id,
             risk_score=risk_score,
             risk_level=risk_level,
             temperature_deviation=abs(temp_actual - ((temp_min + temp_max) / 2)),
-            delivery_delay_days=max(0, (datetime.now() - datetime.strptime(delivery_date, "%Y-%m-%d")).days - 7) if delivery_date else 0,
+            delivery_delay_days=delivery_delay,
             incident_count=incident_count,
             compliance_issues=compliance_issues,
             temperature_actual=temp_actual,

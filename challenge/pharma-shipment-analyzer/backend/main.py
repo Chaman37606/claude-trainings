@@ -5,8 +5,11 @@ from fastapi.staticfiles import StaticFiles
 from fastapi.responses import JSONResponse
 import os
 import json
-from datetime import datetime
+from datetime import datetime, timedelta
 import uuid
+import re
+import atexit
+import shutil
 
 from data_processor import DataProcessor
 from models import analyze_shipments, RiskCalculator
@@ -30,6 +33,34 @@ os.makedirs("uploads", exist_ok=True)
 # Store analysis results in memory (in production, use database)
 analysis_cache = {}
 
+# Sanitize filename - prevent path traversal attacks
+def sanitize_filename(filename: str) -> str:
+    """Remove dangerous characters from filename."""
+    filename = re.sub(r'[/\\]', '', filename)
+    filename = re.sub(r'[^\w\s.-]', '', filename)
+    return filename[:100]
+
+# Cleanup old uploaded files
+def cleanup_old_uploads():
+    """Remove files older than 24 hours."""
+    try:
+        if not os.path.exists("uploads"):
+            return
+        now = datetime.now()
+        for filename in os.listdir("uploads"):
+            file_path = os.path.join("uploads", filename)
+            try:
+                file_time = datetime.fromtimestamp(os.path.getmtime(file_path))
+                if now - file_time > timedelta(hours=24):
+                    os.remove(file_path)
+            except:
+                pass
+    except:
+        pass
+
+# Register cleanup on exit
+atexit.register(cleanup_old_uploads)
+
 
 @app.get("/health")
 async def health_check():
@@ -50,9 +81,10 @@ async def upload_file(file: UploadFile = File(...)):
         if not file.filename.endswith(('.xlsx', '.xls', '.csv')):
             raise HTTPException(status_code=400, detail="Invalid file format. Use Excel (.xlsx) or CSV.")
 
-        # Generate file ID
+        # Generate file ID and sanitize filename
         file_id = str(uuid.uuid4())
-        file_path = f"uploads/{file_id}_{file.filename}"
+        safe_filename = sanitize_filename(file.filename)
+        file_path = f"uploads/{file_id}_{safe_filename}"
 
         # Save file
         with open(file_path, "wb") as f:
@@ -164,75 +196,90 @@ async def get_recommendations(file_id: str):
     if file_id not in analysis_cache:
         raise HTTPException(status_code=404, detail="File not found")
 
-    analysis = analysis_cache[file_id]["analysis"]
-    shipments = analysis["shipments"]
+    try:
+        analysis = analysis_cache[file_id]["analysis"]
+        shipments = analysis["shipments"]
 
-    # Generate intelligent recommendations
-    recommendations = []
-    compliance_alerts = []
+        # Generate intelligent recommendations
+        recommendations = []
+        compliance_alerts = []
 
-    # Analyze temperature excursions
-    temp_excursions = [s for s in shipments if s.reason == "Temperature Excursion"]
-    if len(temp_excursions) > 2:
-        recommendations.append(
-            f"Temperature excursions detected in {len(temp_excursions)} shipments. "
-            "Consider upgrading cooling equipment or reviewing insulation quality."
-        )
-        compliance_alerts.append(
-            "All temperature excursions must be documented per FDA 21 CFR Part 11"
-        )
+        # Analyze temperature excursions
+        temp_excursions = [s for s in shipments if s.reason == "Temperature Excursion"]
+        if len(temp_excursions) > 2:
+            recommendations.append(
+                f"Temperature excursions detected in {len(temp_excursions)} shipments. "
+                "Consider upgrading cooling equipment or reviewing insulation quality."
+            )
+            compliance_alerts.append(
+                "All temperature excursions must be documented per FDA 21 CFR Part 11"
+            )
 
-    # Analyze incidents
-    high_incident_shipments = [s for s in shipments if s.incident_count > 0]
-    if len(high_incident_shipments) > 0:
-        recommendations.append(
-            f"Handling incidents detected in {len(high_incident_shipments)} shipments. "
-            "Implement additional handler training and quality checks."
-        )
-        compliance_alerts.append(
-            "Notify customers of all damaged shipments within 24 hours"
-        )
+        # Analyze incidents
+        high_incident_shipments = [s for s in shipments if s.incident_count > 0]
+        if len(high_incident_shipments) > 0:
+            recommendations.append(
+                f"Handling incidents detected in {len(high_incident_shipments)} shipments. "
+                "Implement additional handler training and quality checks."
+            )
+            compliance_alerts.append(
+                "Notify customers of all damaged shipments within 24 hours"
+            )
 
-    # Analyze risk trends
-    high_risk_count = analysis["high_risk_count"]
-    total = analysis["total_shipments"]
-    high_risk_rate = (high_risk_count / total * 100) if total > 0 else 0
+        # Analyze risk trends
+        high_risk_count = analysis["high_risk_count"]
+        total = analysis["total_shipments"]
+        high_risk_rate = (high_risk_count / total * 100) if total > 0 else 0
 
-    if high_risk_rate > 5:
-        recommendations.append(
-            f"High-risk rate ({high_risk_rate:.1f}%) exceeds acceptable threshold (5%). "
-            "Conduct comprehensive supply chain audit."
-        )
+        if high_risk_rate > 5:
+            recommendations.append(
+                f"High-risk rate ({high_risk_rate:.1f}%) exceeds acceptable threshold (5%). "
+                "Conduct comprehensive supply chain audit."
+            )
 
-    # Average risk analysis
-    if analysis["average_risk_score"] > 50:
-        recommendations.append(
-            "Overall average risk score indicates systemic issues. "
-            "Review all process controls and implement preventive measures."
-        )
+        # Average risk analysis
+        if analysis["average_risk_score"] > 50:
+            recommendations.append(
+                "Overall average risk score indicates systemic issues. "
+                "Review all process controls and implement preventive measures."
+            )
 
-    # Default recommendation if all good
-    if not recommendations:
-        recommendations.append(
-            "Shipment performance is within acceptable parameters. "
-            "Continue current monitoring protocols and maintain documentation."
-        )
+        # Default recommendation if all good
+        if not recommendations:
+            recommendations.append(
+                "Shipment performance is within acceptable parameters. "
+                "Continue current monitoring protocols and maintain documentation."
+            )
 
-    # Risk prediction
-    risk_prediction = "Stable" if high_risk_rate < 5 else "Increasing" if high_risk_rate < 10 else "Critical"
+        # Risk prediction
+        risk_prediction = "Stable" if high_risk_rate < 5 else "Increasing" if high_risk_rate < 10 else "Critical"
 
-    return {
-        "summary": f"Analysis complete: {total} shipments reviewed, {high_risk_count} flagged as high-risk",
-        "risk_level": "GOOD" if high_risk_rate < 5 else "WARNING" if high_risk_rate < 10 else "CRITICAL",
-        "recommendations": recommendations[:3],  # Top 3 recommendations
-        "compliance_alerts": compliance_alerts,
-        "risk_prediction": f"Risk trend: {risk_prediction}",
-        "metrics": {
-            "high_risk_rate": round(high_risk_rate, 2),
-            "excursion_rate": round((len(temp_excursions) / total * 100), 2) if total > 0 else 0,
-            "average_score": analysis["average_risk_score"]
+        return {
+            "summary": f"Analysis complete: {total} shipments reviewed, {high_risk_count} flagged as high-risk",
+            "risk_level": "GOOD" if high_risk_rate < 5 else "WARNING" if high_risk_rate < 10 else "CRITICAL",
+            "recommendations": recommendations[:3],
+            "compliance_alerts": compliance_alerts,
+            "risk_prediction": f"Risk trend: {risk_prediction}",
+            "metrics": {
+                "high_risk_rate": round(high_risk_rate, 2),
+                "excursion_rate": round((len(temp_excursions) / total * 100), 2) if total > 0 else 0,
+                "average_score": analysis["average_risk_score"]
+            }
         }
-    }
+    except Exception as e:
+        # Return default recommendations if analysis fails
+        return {
+            "summary": "Analysis completed with limitations",
+            "risk_level": "UNKNOWN",
+            "recommendations": [
+                "Unable to generate specific recommendations",
+                "Review high-risk shipments manually",
+                "Contact support if issues persist"
+            ],
+            "compliance_alerts": ["Manual review recommended"],
+            "risk_prediction": "Unknown",
+            "metrics": {"error": str(e)}
+        }
 
 
 @app.get("/api/export/{file_id}")
