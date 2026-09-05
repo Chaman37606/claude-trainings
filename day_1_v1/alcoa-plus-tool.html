@@ -1,0 +1,3548 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ALCOA+ Data Integrity Framework - Eli Lilly Operations</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+            color: #333;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .header {
+            background: white;
+            padding: 45px 35px;
+            border-radius: 14px;
+            margin-bottom: 35px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+            text-align: center;
+            border-top: 4px solid #667eea;
+            position: relative;
+        }
+
+        .header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+            border-radius: 14px 14px 0 0;
+        }
+
+        .header h1 {
+            color: #333;
+            margin-bottom: 8px;
+            font-size: 2.5em;
+            font-weight: 800;
+            letter-spacing: -0.5px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .header .subtitle {
+            color: #666;
+            font-size: 1.05em;
+            font-weight: 500;
+            letter-spacing: 0.3px;
+        }
+
+        .nav-tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .nav-tabs button {
+            padding: 12px 28px;
+            border: none;
+            background: white;
+            color: #667eea;
+            font-weight: 700;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.98em;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+            letter-spacing: 0.2px;
+        }
+
+        .dropdown-toggle {
+            background: none;
+            border: none;
+            color: #667eea;
+            cursor: pointer;
+            font-weight: 700;
+            padding: 4px 8px;
+            margin-left: 8px;
+            font-size: 1em;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+        }
+
+        .dropdown-toggle:hover {
+            color: #764ba2;
+            transform: scale(1.2);
+        }
+
+        .dropdown-toggle.active {
+            transform: rotate(180deg) scale(1.2);
+        }
+
+        .dropdown-content {
+            display: none;
+            margin-top: 16px;
+            padding: 18px;
+            background: linear-gradient(135deg, #f8f9fa 0%, #f5f7ff 100%);
+            border-radius: 8px;
+            border-left: 4px solid #667eea;
+            border: 1px solid #e8e8ff;
+            border-left: 4px solid #667eea;
+        }
+
+        .dropdown-content.active {
+            display: block;
+            animation: slideDown 0.3s ease;
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .dropdown-content h4 {
+            color: #667eea;
+            margin-bottom: 10px;
+            font-size: 0.95em;
+        }
+
+        .dropdown-content p {
+            font-size: 0.9em;
+            color: #555;
+            margin-bottom: 8px;
+            line-height: 1.5;
+        }
+
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .kpi-card {
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+            text-align: center;
+            border-top: 0;
+            border: 2px solid #f0f0f0;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .kpi-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+        }
+
+        .kpi-card.warning::before {
+            background: linear-gradient(90deg, #ffc107 0%, #ff9800 100%);
+        }
+
+        .kpi-card.success::before {
+            background: linear-gradient(90deg, #28a745 0%, #20c997 100%);
+        }
+
+        .kpi-card:hover {
+            border-color: #667eea;
+            box-shadow: 0 8px 16px rgba(102, 126, 234, 0.15);
+            transform: translateY(-2px);
+        }
+
+        .kpi-value {
+            font-size: 2.8em;
+            font-weight: 700;
+            color: #667eea;
+            margin: 15px 0 10px 0;
+            letter-spacing: -0.5px;
+        }
+
+        .kpi-card.warning .kpi-value {
+            color: #ffc107;
+        }
+
+        .kpi-card.success .kpi-value {
+            color: #28a745;
+        }
+
+        .kpi-label {
+            color: #555;
+            font-size: 0.9em;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .kpi-trend {
+            font-size: 0.8em;
+            color: #999;
+            margin-top: 12px;
+            font-weight: 500;
+        }
+
+        .chart-container {
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+            margin-bottom: 26px;
+            border-top: 4px solid #667eea;
+        }
+
+        .chart-container h3 {
+            color: #333;
+            margin-bottom: 26px;
+            font-size: 1.25em;
+            font-weight: 700;
+            letter-spacing: -0.3px;
+        }
+
+        .chart-bar {
+            display: flex;
+            align-items: center;
+            margin-bottom: 18px;
+            padding: 12px 0;
+            transition: all 0.2s ease;
+        }
+
+        .chart-bar:hover {
+            transform: translateX(4px);
+        }
+
+        .chart-label {
+            min-width: 130px;
+            font-weight: 600;
+            color: #333;
+            font-size: 0.92em;
+        }
+
+        .chart-bar-fill {
+            flex: 1;
+            height: 28px;
+            background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+            border-radius: 6px;
+            margin: 0 15px;
+            position: relative;
+            box-shadow: 0 2px 4px rgba(102, 126, 234, 0.2);
+            transition: all 0.3s ease;
+        }
+
+        .chart-bar:hover .chart-bar-fill {
+            box-shadow: 0 4px 8px rgba(102, 126, 234, 0.3);
+        }
+
+        .chart-bar-fill.warning {
+            background: linear-gradient(90deg, #ffc107 0%, #ff9800 100%);
+            box-shadow: 0 2px 4px rgba(255, 152, 0, 0.2);
+        }
+
+        .chart-bar-fill.success {
+            background: linear-gradient(90deg, #28a745 0%, #20c997 100%);
+            box-shadow: 0 2px 4px rgba(40, 167, 69, 0.2);
+        }
+
+        .chart-bar:hover .chart-bar-fill.warning {
+            box-shadow: 0 4px 8px rgba(255, 152, 0, 0.3);
+        }
+
+        .chart-bar:hover .chart-bar-fill.success {
+            box-shadow: 0 4px 8px rgba(40, 167, 69, 0.3);
+        }
+
+        .chart-value {
+            min-width: 55px;
+            text-align: right;
+            font-weight: 700;
+            color: #667eea;
+            font-size: 0.95em;
+        }
+
+        .data-table {
+            background: white;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+            margin-bottom: 24px;
+        }
+
+        .data-table table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.94em;
+        }
+
+        .data-table th {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 16px;
+            text-align: left;
+            font-weight: 600;
+            letter-spacing: 0.3px;
+        }
+
+        .data-table td {
+            padding: 14px 16px;
+            border-bottom: 1px solid #f0f0f0;
+            color: #555;
+            transition: background 0.2s ease;
+        }
+
+        .data-table tr:hover td {
+            background: #f9f9ff;
+        }
+
+        .data-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        .data-table tr:nth-child(even) {
+            background: #fafbfc;
+        }
+
+        .data-table tr:nth-child(even):hover td {
+            background: #f5f7ff;
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 0.82em;
+            font-weight: 700;
+            letter-spacing: 0.3px;
+            transition: all 0.2s ease;
+        }
+
+        .status-badge.pass {
+            background: linear-gradient(135deg, #d4edda 0%, #c8e6c9 100%);
+            color: #155724;
+            box-shadow: 0 2px 4px rgba(40, 167, 69, 0.15);
+        }
+
+        .status-badge.pass:hover {
+            box-shadow: 0 4px 8px rgba(40, 167, 69, 0.25);
+            transform: translateY(-1px);
+        }
+
+        .status-badge.fail {
+            background: linear-gradient(135deg, #f8d7da 0%, #ffcccc 100%);
+            color: #721c24;
+            box-shadow: 0 2px 4px rgba(220, 53, 69, 0.15);
+        }
+
+        .status-badge.fail:hover {
+            box-shadow: 0 4px 8px rgba(220, 53, 69, 0.25);
+            transform: translateY(-1px);
+        }
+
+        .status-badge.warning {
+            background: linear-gradient(135deg, #fff3cd 0%, #ffe6b3 100%);
+            color: #856404;
+            box-shadow: 0 2px 4px rgba(255, 193, 7, 0.15);
+        }
+
+        .status-badge.warning:hover {
+            box-shadow: 0 4px 8px rgba(255, 193, 7, 0.25);
+            transform: translateY(-1px);
+        }
+
+        .nav-tabs button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(102, 126, 234, 0.2);
+            color: #764ba2;
+        }
+
+        .nav-tabs button.active {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            box-shadow: 0 6px 12px rgba(102, 126, 234, 0.3);
+        }
+
+        .tab-content {
+            display: none;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .principles-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .principle-card {
+            background: white;
+            padding: 28px;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+            border-left: 5px solid #667eea;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        /* Color-code principle cards */
+        .principle-card:nth-child(1) { border-left-color: #667eea; }
+        .principle-card:nth-child(2) { border-left-color: #764ba2; }
+        .principle-card:nth-child(3) { border-left-color: #e74c3c; }
+        .principle-card:nth-child(4) { border-left-color: #3498db; }
+        .principle-card:nth-child(5) { border-left-color: #16a085; }
+        .principle-card:nth-child(6) { border-left-color: #d35400; }
+        .principle-card:nth-child(7) { border-left-color: #8e44ad; }
+        .principle-card:nth-child(8) { border-left-color: #c0392b; }
+        .principle-card:nth-child(9) { border-left-color: #2980b9; }
+
+        .principle-card:hover {
+            transform: translateY(-6px);
+            box-shadow: 0 12px 24px rgba(102, 126, 234, 0.2);
+            border-left-width: 6px;
+        }
+
+        .principle-card h3 {
+            color: #333;
+            margin-bottom: 8px;
+            font-size: 1.25em;
+            font-weight: 700;
+        }
+
+        .principle-card .definition {
+            color: #667eea;
+            font-weight: 700;
+            margin-bottom: 12px;
+            font-size: 0.85em;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+        }
+
+        .principle-card p {
+            color: #555;
+            line-height: 1.6;
+            margin-bottom: 12px;
+            font-size: 0.95em;
+        }
+
+        .principle-card ul {
+            margin-left: 20px;
+            color: #555;
+            font-size: 0.95em;
+        }
+
+        .principle-card li {
+            margin-bottom: 8px;
+            line-height: 1.5;
+        }
+
+        .checklist {
+            background: white;
+            padding: 28px;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+            margin-bottom: 28px;
+            border-top: 4px solid #667eea;
+            position: relative;
+        }
+
+        .checklist::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 4px;
+            background: linear-gradient(180deg, #667eea 0%, #764ba2 100%);
+            border-radius: 12px 0 0 12px;
+        }
+
+        .checklist h3 {
+            color: #333;
+            margin-bottom: 22px;
+            font-size: 1.25em;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .checklist:nth-of-type(2) h3::before { content: '1'; }
+        .checklist:nth-of-type(3) h3::before { content: '2'; }
+        .checklist:nth-of-type(4) h3::before { content: '3'; }
+        .checklist:nth-of-type(5) h3::before { content: '4'; }
+        .checklist:nth-of-type(6) h3::before { content: '5'; }
+        .checklist:nth-of-type(7) h3::before { content: '6'; }
+
+        .checklist h3::before {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 36px;
+            height: 36px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-radius: 50%;
+            font-size: 0.85em;
+            font-weight: 800;
+            flex-shrink: 0;
+        }
+
+        .checklist-item {
+            display: flex;
+            align-items: flex-start;
+            margin-bottom: 14px;
+            padding: 14px 16px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+            border: 1px solid #e8e8e8;
+        }
+
+        .checklist-item:hover {
+            background: #f0f7ff;
+            border-color: #667eea;
+            transform: translateX(4px);
+        }
+
+        .checklist-item input[type="checkbox"] {
+            width: 22px;
+            height: 22px;
+            margin-right: 14px;
+            cursor: pointer;
+            accent-color: #667eea;
+            margin-top: 1px;
+            flex-shrink: 0;
+            border-radius: 4px;
+        }
+
+        .checklist-item input[type="checkbox"]:checked + .checklist-text {
+            color: #bbb;
+            text-decoration: line-through;
+        }
+
+        .checklist-text {
+            flex: 1;
+            color: #333;
+            cursor: pointer;
+            font-size: 0.96em;
+            line-height: 1.6;
+            font-weight: 500;
+        }
+
+        .matrix-table {
+            background: white;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+            margin-bottom: 26px;
+        }
+
+        .matrix-table table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.94em;
+        }
+
+        .matrix-table th {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 16px;
+            text-align: left;
+            font-weight: 600;
+            letter-spacing: 0.3px;
+        }
+
+        .matrix-table td {
+            padding: 14px 16px;
+            border-bottom: 1px solid #f0f0f0;
+            color: #555;
+            transition: background 0.2s ease;
+        }
+
+        .matrix-table tr:hover td {
+            background: #f9f9ff;
+        }
+
+        .matrix-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        .matrix-table tr:nth-child(even) {
+            background: #fafbfc;
+        }
+
+        .matrix-table tr:nth-child(even):hover td {
+            background: #f5f7ff;
+        }
+
+        .implementation-section {
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+            margin-bottom: 26px;
+            border-top: 4px solid #667eea;
+        }
+
+        .implementation-section h3 {
+            color: #333;
+            margin-bottom: 16px;
+            font-size: 1.3em;
+            font-weight: 700;
+        }
+
+        .implementation-section h4 {
+            color: #667eea;
+            margin-top: 20px;
+            margin-bottom: 12px;
+            font-size: 1.05em;
+            font-weight: 700;
+        }
+
+        .implementation-section p, .implementation-section li {
+            color: #555;
+            line-height: 1.6;
+            margin-bottom: 10px;
+            font-size: 0.95em;
+        }
+
+        .implementation-section ol, .implementation-section ul {
+            margin-left: 25px;
+        }
+
+        .resources-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .resource-card {
+            background: white;
+            padding: 26px;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+            border-top: 4px solid;
+            border-top-color: #667eea;
+            transition: all 0.3s ease;
+        }
+
+        .resource-card:nth-child(1) { border-top-color: #667eea; }
+        .resource-card:nth-child(2) { border-top-color: #764ba2; }
+        .resource-card:nth-child(3) { border-top-color: #e74c3c; }
+        .resource-card:nth-child(4) { border-top-color: #3498db; }
+        .resource-card:nth-child(5) { border-top-color: #16a085; }
+        .resource-card:nth-child(6) { border-top-color: #d35400; }
+
+        .resource-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.12);
+        }
+
+        .resource-card h4 {
+            color: #333;
+            margin-bottom: 12px;
+            font-weight: 700;
+            font-size: 1.05em;
+        }
+
+        .resource-card p {
+            color: #666;
+            font-size: 0.93em;
+            margin-bottom: 14px;
+            line-height: 1.6;
+        }
+
+        .btn {
+            display: inline-block;
+            padding: 11px 24px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            text-decoration: none;
+            border-radius: 8px;
+            font-weight: 700;
+            border: none;
+            cursor: pointer;
+            font-size: 0.92em;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 8px rgba(102, 126, 234, 0.2);
+            letter-spacing: 0.3px;
+        }
+
+        .btn:hover {
+            background: linear-gradient(135deg, #764ba2 0%, #667eea 100%);
+            transform: translateY(-3px);
+            box-shadow: 0 6px 16px rgba(102, 126, 234, 0.3);
+        }
+
+        .btn:active {
+            transform: translateY(-1px);
+            box-shadow: 0 3px 8px rgba(102, 126, 234, 0.2);
+        }
+
+        .alert {
+            background: linear-gradient(135deg, #fff3cd 0%, #ffe6b3 100%);
+            border-left: 4px solid #ffc107;
+            padding: 18px;
+            border-radius: 8px;
+            margin-bottom: 26px;
+            color: #856404;
+            border: 1px solid #ffe6b3;
+            border-left: 4px solid #ffc107;
+            font-weight: 500;
+        }
+
+        .success-alert {
+            background: linear-gradient(135deg, #d4edda 0%, #c8e6c9 100%);
+            border-left: 4px solid #28a745;
+            color: #155724;
+            border: 1px solid #c8e6c9;
+            border-left: 4px solid #28a745;
+        }
+
+        .info-box {
+            background: linear-gradient(135deg, #e7f3ff 0%, #d9ecff 100%);
+            border-left: 4px solid #667eea;
+            padding: 18px;
+            border-radius: 8px;
+            margin-bottom: 18px;
+            color: #004085;
+            border: 1px solid #d9ecff;
+            border-left: 4px solid #667eea;
+            font-weight: 500;
+        }
+
+        .score-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 28px;
+            border-radius: 12px;
+            text-align: center;
+            margin-bottom: 26px;
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.25);
+            transition: all 0.3s ease;
+        }
+
+        .score-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 20px rgba(102, 126, 234, 0.35);
+        }
+
+        .score-card h3 {
+            font-size: 2.8em;
+            margin-bottom: 8px;
+            font-weight: 800;
+            letter-spacing: -1px;
+        }
+
+        .score-card p {
+            font-size: 1.1em;
+            opacity: 0.95;
+            font-weight: 500;
+        }
+
+        .footer {
+            text-align: center;
+            color: rgba(255, 255, 255, 0.9);
+            padding: 40px;
+            font-size: 0.88em;
+            margin-top: 40px;
+        }
+
+        .footer p {
+            margin: 6px 0;
+            font-weight: 500;
+        }
+
+        /* ============ PHASE 2 STYLES ============ */
+
+        /* Alert Banner */
+        .alert-banner {
+            background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
+            color: white;
+            padding: 18px 30px;
+            border-radius: 8px;
+            margin-bottom: 30px;
+            display: none;
+            box-shadow: 0 4px 12px rgba(220, 53, 69, 0.2);
+            animation: slideDown 0.3s ease;
+        }
+
+        .alert-banner.active {
+            display: block;
+        }
+
+        .alert-banner h4 {
+            color: white;
+            margin-bottom: 8px;
+            font-size: 1.05em;
+        }
+
+        .alert-banner p {
+            margin: 0;
+            font-size: 0.95em;
+            opacity: 0.95;
+        }
+
+        .alert-banner .close-btn {
+            float: right;
+            background: none;
+            border: none;
+            color: white;
+            cursor: pointer;
+            font-size: 1.2em;
+            font-weight: bold;
+            opacity: 0.8;
+        }
+
+        .alert-banner .close-btn:hover {
+            opacity: 1;
+        }
+
+        /* Export Controls */
+        .export-controls {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+        }
+
+        .export-btn {
+            display: inline-block;
+            padding: 11px 24px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-weight: 700;
+            cursor: pointer;
+            font-size: 0.92em;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 8px rgba(102, 126, 234, 0.2);
+        }
+
+        .export-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(102, 126, 234, 0.3);
+        }
+
+        /* Export Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .modal.active {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-content {
+            background: white;
+            padding: 35px;
+            border-radius: 12px;
+            max-width: 500px;
+            width: 90%;
+            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.3);
+            animation: slideDown 0.3s ease;
+        }
+
+        .modal-content h3 {
+            color: #333;
+            margin-bottom: 25px;
+            font-size: 1.4em;
+            font-weight: 700;
+        }
+
+        .modal-options {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+
+        .export-option {
+            padding: 18px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .export-option:hover {
+            border-color: #667eea;
+            background: #f5f7ff;
+        }
+
+        .export-option strong {
+            display: block;
+            color: #333;
+            margin-bottom: 8px;
+            font-size: 0.95em;
+        }
+
+        .export-option small {
+            color: #999;
+            font-size: 0.85em;
+        }
+
+        .modal-actions {
+            display: flex;
+            gap: 15px;
+            justify-content: flex-end;
+        }
+
+        .modal-btn {
+            padding: 11px 24px;
+            border: none;
+            border-radius: 8px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .modal-btn.primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .modal-btn.primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(102, 126, 234, 0.3);
+        }
+
+        .modal-btn.secondary {
+            background: #f5f7fa;
+            color: #333;
+            border: 1px solid #e8ecf1;
+        }
+
+        .modal-btn.secondary:hover {
+            background: #e8ecf1;
+        }
+
+        /* Search & Filter Tab */
+        .search-container {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+
+        .search-input-group {
+            position: relative;
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 15px 20px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 1em;
+            transition: all 0.3s ease;
+        }
+
+        .search-input:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .autocomplete-dropdown {
+            display: none;
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            background: white;
+            border: 1px solid #e0e0e0;
+            border-top: none;
+            border-radius: 0 0 8px 8px;
+            max-height: 300px;
+            overflow-y: auto;
+            z-index: 100;
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+        }
+
+        .autocomplete-dropdown.active {
+            display: block;
+        }
+
+        .autocomplete-item {
+            padding: 12px 20px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        .autocomplete-item:hover {
+            background: #f5f7ff;
+            color: #667eea;
+        }
+
+        .filter-panel {
+            background: white;
+            padding: 25px;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+        }
+
+        .filter-panel h4 {
+            color: #333;
+            margin-bottom: 18px;
+            font-size: 1.05em;
+            font-weight: 700;
+        }
+
+        .filter-group {
+            margin-bottom: 20px;
+        }
+
+        .filter-group label {
+            display: flex;
+            align-items: center;
+            padding: 10px 0;
+            cursor: pointer;
+            color: #555;
+            font-weight: 500;
+            transition: all 0.2s ease;
+        }
+
+        .filter-group label:hover {
+            color: #667eea;
+        }
+
+        .filter-group input[type="checkbox"] {
+            margin-right: 12px;
+            width: 18px;
+            height: 18px;
+            accent-color: #667eea;
+            cursor: pointer;
+        }
+
+        .search-results {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 20px;
+            margin-top: 30px;
+        }
+
+        .result-card {
+            background: white;
+            padding: 25px;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+            border-left: 4px solid #667eea;
+            transition: all 0.3s ease;
+        }
+
+        .result-card:hover {
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.12);
+            transform: translateY(-4px);
+        }
+
+        .result-card .type-badge {
+            display: inline-block;
+            padding: 6px 12px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-radius: 20px;
+            font-size: 0.75em;
+            font-weight: 700;
+            margin-bottom: 12px;
+            letter-spacing: 0.5px;
+        }
+
+        .result-card h4 {
+            color: #333;
+            margin-bottom: 12px;
+            font-size: 1.1em;
+            font-weight: 700;
+        }
+
+        .result-card p {
+            color: #666;
+            font-size: 0.93em;
+            line-height: 1.6;
+            margin-bottom: 15px;
+        }
+
+        .result-card .result-meta {
+            display: flex;
+            gap: 15px;
+            font-size: 0.85em;
+            color: #999;
+            margin-bottom: 15px;
+        }
+
+        .result-card .result-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .result-card .btn {
+            font-size: 0.85em;
+            padding: 8px 15px;
+            flex: 1;
+        }
+
+        .result-card .btn.secondary {
+            background: #f5f7fa;
+            color: #667eea;
+            border: 1px solid #e0e0e0;
+        }
+
+        /* Quiz Tab */
+        .quiz-container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .quiz-mode-selector {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .quiz-mode-card {
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            border: 2px solid #e0e0e0;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .quiz-mode-card:hover {
+            border-color: #667eea;
+            box-shadow: 0 8px 16px rgba(102, 126, 234, 0.2);
+            transform: translateY(-4px);
+        }
+
+        .quiz-mode-card h4 {
+            color: #333;
+            margin-bottom: 12px;
+            font-weight: 700;
+        }
+
+        .quiz-mode-card p {
+            color: #666;
+            font-size: 0.93em;
+            line-height: 1.5;
+        }
+
+        .quiz-active {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-color: transparent;
+        }
+
+        .quiz-active h4,
+        .quiz-active p {
+            color: white;
+        }
+
+        .quiz-progress-bar {
+            background: #e0e0e0;
+            height: 8px;
+            border-radius: 4px;
+            margin-bottom: 30px;
+            overflow: hidden;
+        }
+
+        .quiz-progress-fill {
+            background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+            height: 100%;
+            transition: width 0.3s ease;
+        }
+
+        .question-card {
+            background: white;
+            padding: 35px;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+            margin-bottom: 30px;
+            border-top: 4px solid #667eea;
+        }
+
+        .question-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+        }
+
+        .question-number {
+            color: #667eea;
+            font-weight: 700;
+            font-size: 0.95em;
+        }
+
+        .question-difficulty {
+            display: inline-block;
+            padding: 6px 12px;
+            background: #f5f7fa;
+            color: #667eea;
+            border-radius: 20px;
+            font-size: 0.8em;
+            font-weight: 700;
+        }
+
+        .question-text {
+            color: #333;
+            font-size: 1.1em;
+            font-weight: 600;
+            margin-bottom: 25px;
+            line-height: 1.6;
+        }
+
+        .question-options {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+
+        .option-button {
+            padding: 18px;
+            background: #f9f9f9;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            text-align: left;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-size: 0.95em;
+            font-weight: 500;
+            color: #333;
+        }
+
+        .option-button:hover {
+            border-color: #667eea;
+            background: #f5f7ff;
+        }
+
+        .option-button.selected {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-color: transparent;
+        }
+
+        .option-button.correct {
+            background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+            color: white;
+            border-color: transparent;
+        }
+
+        .option-button.incorrect {
+            background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
+            color: white;
+            border-color: transparent;
+        }
+
+        .quiz-feedback {
+            padding: 18px;
+            background: linear-gradient(135deg, #d4edda 0%, #c8e6c9 100%);
+            border-left: 4px solid #28a745;
+            border-radius: 8px;
+            margin-bottom: 25px;
+            color: #155724;
+            display: none;
+        }
+
+        .quiz-feedback.active {
+            display: block;
+            animation: slideDown 0.3s ease;
+        }
+
+        .quiz-feedback.error {
+            background: linear-gradient(135deg, #f8d7da 0%, #ffcccc 100%);
+            border-left-color: #dc3545;
+            color: #721c24;
+        }
+
+        .quiz-feedback strong {
+            display: block;
+            margin-bottom: 8px;
+        }
+
+        .quiz-actions {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+        }
+
+        .certificate {
+            background: white;
+            padding: 50px 40px;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+            text-align: center;
+            border-top: 4px solid #667eea;
+            border-bottom: 4px solid #764ba2;
+            margin: 30px 0;
+        }
+
+        .certificate-header {
+            font-size: 2.2em;
+            color: #667eea;
+            font-weight: 800;
+            margin-bottom: 20px;
+            letter-spacing: -0.5px;
+        }
+
+        .certificate-content {
+            margin: 30px 0;
+            line-height: 1.8;
+        }
+
+        .certificate-name {
+            font-size: 1.4em;
+            color: #333;
+            font-weight: 700;
+            margin: 20px 0;
+        }
+
+        .certificate-score {
+            font-size: 1.2em;
+            color: #667eea;
+            font-weight: 700;
+            margin: 15px 0;
+        }
+
+        .certificate-date {
+            color: #999;
+            font-size: 0.9em;
+            margin-top: 25px;
+        }
+
+        /* Progress Dashboard */
+        .progress-timeline {
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+            margin-bottom: 30px;
+            border-top: 4px solid #667eea;
+        }
+
+        .progress-timeline h3 {
+            color: #333;
+            margin-bottom: 25px;
+            font-size: 1.3em;
+            font-weight: 700;
+        }
+
+        .phase-item {
+            margin-bottom: 25px;
+            padding-bottom: 25px;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        .phase-item:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+            padding-bottom: 0;
+        }
+
+        .phase-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+
+        .phase-name {
+            font-weight: 700;
+            color: #333;
+            font-size: 0.95em;
+        }
+
+        .phase-percent {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.85em;
+            font-weight: 700;
+        }
+
+        .phase-progress-bar {
+            background: #e0e0e0;
+            height: 12px;
+            border-radius: 6px;
+            overflow: hidden;
+            margin-bottom: 8px;
+        }
+
+        .phase-progress-fill {
+            background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+            height: 100%;
+            transition: width 0.5s ease;
+        }
+
+        .phase-meta {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.85em;
+            color: #999;
+        }
+
+        .training-gauge {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .gauge-card {
+            background: white;
+            padding: 25px;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+            text-align: center;
+            border-top: 4px solid #667eea;
+            transition: all 0.3s ease;
+        }
+
+        .gauge-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.12);
+        }
+
+        .gauge-label {
+            color: #666;
+            font-size: 0.95em;
+            font-weight: 600;
+            margin-bottom: 15px;
+        }
+
+        .gauge-number {
+            font-size: 2.5em;
+            font-weight: 800;
+            color: #667eea;
+            margin-bottom: 8px;
+        }
+
+        .gauge-detail {
+            color: #999;
+            font-size: 0.85em;
+        }
+
+        /* Trend Indicator */
+        .trend-indicator {
+            display: inline-block;
+            padding: 6px 12px;
+            border-radius: 6px;
+            font-size: 0.85em;
+            font-weight: 700;
+            margin-left: 10px;
+        }
+
+        .trend-up {
+            background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+            color: white;
+        }
+
+        .trend-down {
+            background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
+            color: white;
+        }
+
+        .trend-stable {
+            background: linear-gradient(135deg, #ffc107 0%, #ff9800 100%);
+            color: white;
+        }
+
+        @media (max-width: 768px) {
+            .search-container {
+                grid-template-columns: 1fr;
+            }
+
+            .search-results {
+                grid-template-columns: 1fr;
+            }
+
+            .modal-options {
+                grid-template-columns: 1fr;
+            }
+
+            .quiz-mode-selector {
+                grid-template-columns: 1fr;
+            }
+
+            .export-controls {
+                flex-direction: column;
+            }
+
+            .export-btn {
+                width: 100%;
+            }
+
+            .modal-content {
+                max-width: 90%;
+            }
+
+            .certificate {
+                padding: 35px 25px;
+            }
+
+            .certificate-header {
+                font-size: 1.8em;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .search-input {
+                font-size: 16px;
+            }
+
+            .question-card {
+                padding: 20px;
+            }
+
+            .certificate {
+                padding: 25px 15px;
+            }
+
+            .phase-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 10px;
+            }
+
+            .modal-actions {
+                flex-direction: column-reverse;
+            }
+
+            .modal-btn {
+                width: 100%;
+            }
+        }
+
+        @media (max-width: 768px) {
+            body {
+                padding: 12px;
+            }
+
+            .header {
+                padding: 35px 25px;
+                margin-bottom: 28px;
+            }
+
+            .header h1 {
+                font-size: 2em;
+            }
+
+            .header .subtitle {
+                font-size: 0.95em;
+            }
+
+            .nav-tabs {
+                flex-direction: column;
+                gap: 8px;
+                margin-bottom: 25px;
+            }
+
+            .nav-tabs button {
+                width: 100%;
+                padding: 12px 20px;
+            }
+
+            .principles-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .dashboard-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .resources-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .kpi-card {
+                padding: 24px;
+            }
+
+            .principle-card {
+                padding: 22px;
+            }
+
+            .chart-container {
+                padding: 22px;
+            }
+
+            .checklist {
+                padding: 22px;
+            }
+
+            .data-table table {
+                font-size: 0.88em;
+            }
+
+            .data-table th, .data-table td {
+                padding: 10px 12px;
+            }
+
+            .footer {
+                padding: 30px 20px;
+                font-size: 0.8em;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .header h1 {
+                font-size: 1.5em;
+            }
+
+            .nav-tabs button {
+                font-size: 0.88em;
+                padding: 10px 16px;
+            }
+
+            .kpi-value {
+                font-size: 2em;
+            }
+
+            .kpi-card {
+                padding: 18px;
+            }
+
+            .chart-label {
+                min-width: 100px;
+                font-size: 0.85em;
+            }
+
+            .principle-card {
+                padding: 18px;
+            }
+
+            .principle-card h3 {
+                font-size: 1.1em;
+            }
+
+            .data-table table {
+                font-size: 0.8em;
+            }
+
+            .checklist-text {
+                font-size: 0.88em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>ALCOA+ Data Integrity Framework</h1>
+            <p class="subtitle">Eli Lilly Operations - Ensuring Quality & Compliance</p>
+        </div>
+
+        <div class="nav-tabs">
+            <button class="tab-btn active" onclick="switchTab('dashboard')">Dashboard</button>
+            <button class="tab-btn" onclick="switchTab('overview')">Overview</button>
+            <button class="tab-btn" onclick="switchTab('principles')">Principles</button>
+            <button class="tab-btn" onclick="switchTab('checklist')">Implementation</button>
+            <button class="tab-btn" onclick="switchTab('search')">Search & Filter</button>
+            <button class="tab-btn" onclick="switchTab('quiz')">Assessment</button>
+            <button class="tab-btn" onclick="switchTab('progress')">Progress</button>
+            <button class="tab-btn" onclick="switchTab('resources')">Resources</button>
+        </div>
+
+        <!-- Dashboard Tab -->
+        <div id="dashboard" class="tab-content active">
+            <div id="dashboardAlert" class="alert-banner">
+                <button class="close-btn" onclick="this.parentElement.classList.remove('active'); return false;">✕</button>
+                <h4 id="alertTitle">Compliance Alert</h4>
+                <p id="alertMessage">Some systems are below target compliance levels.</p>
+            </div>
+
+            <div class="export-controls">
+                <button class="export-btn" onclick="exportManager.showModal()">Export Dashboard</button>
+                <button class="export-btn" onclick="exportManager.printDashboard()">Print Dashboard</button>
+            </div>
+
+            <div class="implementation-section">
+                <h3>ALCOA+ Compliance Dashboard</h3>
+                <p>Real-time metrics and test data for monitoring ALCOA+ implementation across operations.</p>
+
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 15px; margin-bottom: 25px;">
+                    <div>
+                        <label style="font-weight: 700; color: #333; display: block; margin-bottom: 10px; font-size: 0.92em; letter-spacing: 0.3px;">Select Test Scenario:</label>
+                        <select id="scenarioSelector" onchange="loadTestScenario()" style="width: 100%; padding: 12px; border: 2px solid #e0e0e0; border-radius: 8px; font-size: 0.94em; font-weight: 500; color: #333; background: white; transition: all 0.3s ease; cursor: pointer;">
+                            <option value="baseline">Baseline Compliance</option>
+                            <option value="manufacturing">Manufacturing Area</option>
+                            <option value="quality">Quality Assurance</option>
+                            <option value="lims">LIMS System</option>
+                            <option value="erp">ERP System</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label style="font-weight: 700; color: #333; display: block; margin-bottom: 10px; font-size: 0.92em; letter-spacing: 0.3px;">Select Principle Focus:</label>
+                        <select id="principleSelector" onchange="filterByPrinciple()" style="width: 100%; padding: 12px; border: 2px solid #e0e0e0; border-radius: 8px; font-size: 0.94em; font-weight: 500; color: #333; background: white; transition: all 0.3s ease; cursor: pointer;">
+                            <option value="all">All Principles</option>
+                            <option value="attributable">Attributable</option>
+                            <option value="legible">Legible</option>
+                            <option value="contemporaneous">Contemporaneous</option>
+                            <option value="original">Original</option>
+                            <option value="accurate">Accurate</option>
+                            <option value="complete">Complete</option>
+                            <option value="consistent">Consistent</option>
+                            <option value="enduring">Enduring</option>
+                            <option value="available">Available</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <div class="dashboard-grid">
+                <div class="kpi-card success">
+                    <div class="kpi-label">Overall Compliance</div>
+                    <div class="kpi-value">94%</div>
+                    <div class="kpi-trend">↑ +5% from last month</div>
+                </div>
+
+                <div class="kpi-card">
+                    <div class="kpi-label">Systems Audited</div>
+                    <div class="kpi-value">12/15</div>
+                    <div class="kpi-trend">3 pending Q3 2026</div>
+                </div>
+
+                <div class="kpi-card warning">
+                    <div class="kpi-label">Critical Findings</div>
+                    <div class="kpi-value">2</div>
+                    <div class="kpi-trend">Due for remediation: 9/15/2026</div>
+                </div>
+
+                <div class="kpi-card success">
+                    <div class="kpi-label">Personnel Trained</div>
+                    <div class="kpi-value">87/95</div>
+                    <div class="kpi-trend">92% completion rate</div>
+                </div>
+            </div>
+
+            <div class="chart-container">
+                <h3>ALCOA+ Principle Compliance</h3>
+                <div class="chart-bar">
+                    <div class="chart-label">Attributable</div>
+                    <div class="chart-bar-fill success" style="width: 98%;"></div>
+                    <div class="chart-value">98%</div>
+                </div>
+                <div class="chart-bar">
+                    <div class="chart-label">Legible</div>
+                    <div class="chart-bar-fill success" style="width: 96%;"></div>
+                    <div class="chart-value">96%</div>
+                </div>
+                <div class="chart-bar">
+                    <div class="chart-label">Contemporaneous</div>
+                    <div class="chart-bar-fill warning" style="width: 87%;"></div>
+                    <div class="chart-value">87%</div>
+                </div>
+                <div class="chart-bar">
+                    <div class="chart-label">Original</div>
+                    <div class="chart-bar-fill success" style="width: 95%;"></div>
+                    <div class="chart-value">95%</div>
+                </div>
+                <div class="chart-bar">
+                    <div class="chart-label">Accurate</div>
+                    <div class="chart-bar-fill success" style="width: 92%;"></div>
+                    <div class="chart-value">92%</div>
+                </div>
+                <div class="chart-bar">
+                    <div class="chart-label">Complete</div>
+                    <div class="chart-bar-fill success" style="width: 91%;"></div>
+                    <div class="chart-value">91%</div>
+                </div>
+                <div class="chart-bar">
+                    <div class="chart-label">Consistent</div>
+                    <div class="chart-bar-fill warning" style="width: 85%;"></div>
+                    <div class="chart-value">85%</div>
+                </div>
+                <div class="chart-bar">
+                    <div class="chart-label">Enduring</div>
+                    <div class="chart-bar-fill success" style="width: 99%;"></div>
+                    <div class="chart-value">99%</div>
+                </div>
+                <div class="chart-bar">
+                    <div class="chart-label">Available</div>
+                    <div class="chart-bar-fill success" style="width: 94%;"></div>
+                    <div class="chart-value">94%</div>
+                </div>
+            </div>
+
+            <div class="data-table">
+                <h3 style="padding: 20px 20px 0; color: #333; font-weight: 700; font-size: 1.2em;">Recent Audit Results</h3>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>System/Area</th>
+                            <th>Audit Date</th>
+                            <th>Auditor</th>
+                            <th>Findings</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>Manufacturing ERP</strong></td>
+                            <td>2026-08-20</td>
+                            <td>John Smith</td>
+                            <td>0 Critical, 2 Minor</td>
+                            <td><span class="status-badge warning">In Progress</span></td>
+                        </tr>
+                        <tr>
+                            <td><strong>LIMS System</strong></td>
+                            <td>2026-08-18</td>
+                            <td>Sarah Johnson</td>
+                            <td>0 Critical, 0 Minor</td>
+                            <td><span class="status-badge pass">Compliant</span></td>
+                        </tr>
+                        <tr>
+                            <td><strong>Document Management</strong></td>
+                            <td>2026-08-15</td>
+                            <td>Mike Davis</td>
+                            <td>1 Critical, 3 Minor</td>
+                            <td><span class="status-badge fail">Non-Compliant</span></td>
+                        </tr>
+                        <tr>
+                            <td><strong>Quality Management</strong></td>
+                            <td>2026-08-12</td>
+                            <td>Lisa Chen</td>
+                            <td>0 Critical, 1 Minor</td>
+                            <td><span class="status-badge warning">In Progress</span></td>
+                        </tr>
+                        <tr>
+                            <td><strong>Batch Record System</strong></td>
+                            <td>2026-08-10</td>
+                            <td>Robert Wilson</td>
+                            <td>0 Critical, 0 Minor</td>
+                            <td><span class="status-badge pass">Compliant</span></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="data-table">
+                <h3 style="padding: 20px 20px 0; color: #333; font-weight: 700; font-size: 1.2em;">Compliance Test Scenarios</h3>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Test Name</th>
+                            <th>Principle</th>
+                            <th>Test Case</th>
+                            <th>Expected Result</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>Audit Trail Generation</strong></td>
+                            <td>Attributable</td>
+                            <td>User creates record with timestamp</td>
+                            <td>User ID + timestamp logged</td>
+                            <td><span class="status-badge pass">Pass</span></td>
+                        </tr>
+                        <tr>
+                            <td><strong>Amendment Tracking</strong></td>
+                            <td>Legible</td>
+                            <td>User amends existing record</td>
+                            <td>Original + new value visible</td>
+                            <td><span class="status-badge pass">Pass</span></td>
+                        </tr>
+                        <tr>
+                            <td><strong>Real-Time Entry Validation</strong></td>
+                            <td>Contemporaneous</td>
+                            <td>Attempt backdated entry</td>
+                            <td>System rejects backdated data</td>
+                            <td><span class="status-badge pass">Pass</span></td>
+                        </tr>
+                        <tr>
+                            <td><strong>Original Record Preservation</strong></td>
+                            <td>Original</td>
+                            <td>Create and copy record</td>
+                            <td>Original marked; copy identified</td>
+                            <td><span class="status-badge pass">Pass</span></td>
+                        </tr>
+                        <tr>
+                            <td><strong>Data Validation Rules</strong></td>
+                            <td>Accurate</td>
+                            <td>Enter invalid data format</td>
+                            <td>System prevents invalid entry</td>
+                            <td><span class="status-badge warning">Partial</span></td>
+                        </tr>
+                        <tr>
+                            <td><strong>Mandatory Fields</strong></td>
+                            <td>Complete</td>
+                            <td>Submit record missing field</td>
+                            <td>System requires all fields</td>
+                            <td><span class="status-badge pass">Pass</span></td>
+                        </tr>
+                        <tr>
+                            <td><strong>Cross-System Sync</strong></td>
+                            <td>Consistent</td>
+                            <td>Update data in System A</td>
+                            <td>System B reflects change within 5 min</td>
+                            <td><span class="status-badge fail">Fail</span></td>
+                        </tr>
+                        <tr>
+                            <td><strong>Backup Integrity</strong></td>
+                            <td>Enduring</td>
+                            <td>Restore from backup</td>
+                            <td>All data restored without corruption</td>
+                            <td><span class="status-badge pass">Pass</span></td>
+                        </tr>
+                        <tr>
+                            <td><strong>Access Control</strong></td>
+                            <td>Available</td>
+                            <td>Unauthorized user accesses record</td>
+                            <td>Access denied; logged</td>
+                            <td><span class="status-badge pass">Pass</span></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="alert success-alert">
+                <strong>Dashboard Note:</strong> All data shown is sample test data for demonstration purposes. Real compliance metrics will be populated from your audit management system.
+            </div>
+        </div>
+
+        <!-- Overview Tab -->
+        <div id="overview" class="tab-content">
+            <div class="implementation-section">
+                <h3>What is ALCOA+?</h3>
+                <p>ALCOA+ is an international data integrity standard that ensures all records in pharmaceutical operations maintain the highest level of quality, accuracy, and compliance. It builds upon the original ALCOA principles with additional requirements for modern operational environments.</p>
+
+                <div class="info-box">
+                    <strong>Key Purpose:</strong> ALCOA+ ensures that pharmaceutical and operational data is reliable, traceable, and verifiable throughout its lifecycle.
+                </div>
+
+                <h4>Core Benefits</h4>
+                <ul>
+                    <li><strong>Regulatory Compliance:</strong> Meets FDA, EMA, and ICH requirements</li>
+                    <li><strong>Product Quality:</strong> Ensures consistency and safety of pharmaceutical products</li>
+                    <li><strong>Risk Management:</strong> Identifies and mitigates data integrity risks</li>
+                    <li><strong>Audit Trail:</strong> Maintains complete electronic records with full traceability</li>
+                    <li><strong>Operational Excellence:</strong> Establishes standardized data practices across teams</li>
+                </ul>
+
+                <h4>Who Should Use This?</h4>
+                <ul>
+                    <li>Manufacturing and Quality Assurance teams</li>
+                    <li>Laboratory and Testing personnel</li>
+                    <li>Process operations and maintenance staff</li>
+                    <li>Data management and IT support</li>
+                    <li>Regulatory and compliance departments</li>
+                </ul>
+            </div>
+
+            <div class="matrix-table">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Principle</th>
+                            <th>Definition</th>
+                            <th>Key Requirement</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>Attributable</strong></td>
+                            <td>Who performed the action?</td>
+                            <td>User identification, timestamps, electronic signatures</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Legible</strong></td>
+                            <td>Is the data clear and readable?</td>
+                            <td>Permanent, indelible records; proper formatting</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Contemporaneous</strong></td>
+                            <td>When was it recorded?</td>
+                            <td>Real-time entry; no backfilling or retroactive changes</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Original</strong></td>
+                            <td>Is this the first/primary record?</td>
+                            <td>First entry preserved; copies properly marked</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Accurate</strong></td>
+                            <td>Is the data correct?</td>
+                            <td>Data verification, SOPs, training, error correction</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Complete</strong></td>
+                            <td>Are all required fields captured?</td>
+                            <td>No missing data; all supporting documentation included</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Consistent</strong></td>
+                            <td>Is data uniform across systems?</td>
+                            <td>Same data referenced consistently; reconciliation performed</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Enduring</strong></td>
+                            <td>Will records persist long-term?</td>
+                            <td>Secure storage, backup strategies, retention compliance</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Available</strong></td>
+                            <td>Can authorized users access records?</td>
+                            <td>Accessible retrieval; proper access controls; disaster recovery</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Principles Tab -->
+        <div id="principles" class="tab-content">
+            <div class="principles-grid">
+                <div class="principle-card">
+                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                        <h3 style="margin: 0;">Attributable</h3>
+                        <button class="dropdown-toggle" onclick="toggleDropdown(this)">▼</button>
+                    </div>
+                    <div class="definition">WHO performed the action?</div>
+                    <p>Every action and record must be linked to the person who created or modified it, with an unambiguous identification.</p>
+                    <ul>
+                        <li>User IDs and electronic signatures</li>
+                        <li>Timestamp with timezone information</li>
+                        <li>Role-based access control (RBAC)</li>
+                        <li>Audit logs for all changes</li>
+                    </ul>
+                    <div class="dropdown-content">
+                        <h4>Test Data Example</h4>
+                        <p><strong>User:</strong> JSmith001 | <strong>Timestamp:</strong> 2026-08-29 14:32:45 UTC | <strong>Action:</strong> Created batch record</p>
+                        <p><strong>Audit Trail:</strong> Record ID: BR-2026-08-001, Created by: John Smith, Date: 08/29/2026, Time: 2:32 PM EDT</p>
+                        <p><strong>Electronic Signature:</strong> /es/ JSmith001 08/29/2026 14:32:45</p>
+                    </div>
+                </div>
+
+                <div class="principle-card">
+                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                        <h3 style="margin: 0;">Legible</h3>
+                        <button class="dropdown-toggle" onclick="toggleDropdown(this)">▼</button>
+                    </div>
+                    <div class="definition">Is the data clear and readable?</div>
+                    <p>Data must be recorded in a permanent, indelible format that remains clear and understandable throughout its retention period.</p>
+                    <ul>
+                        <li>Permanent ink or electronic equivalents</li>
+                        <li>Clear formatting and standardization</li>
+                        <li>No erasures or use of correction fluid</li>
+                        <li>Proper character encoding for digital records</li>
+                    </ul>
+                    <div class="dropdown-content">
+                        <h4>Test Data Example</h4>
+                        <p><strong>Original Record:</strong> Temperature Reading: 72.3°C | Pressure: 2.5 bar</p>
+                        <p><strong>Amendment Log:</strong> Original value → Amended value "72.5°C" by MJones | 08/29/2026 15:45</p>
+                        <p><strong>Format Check:</strong> UTF-8 encoded, indexed fully searchable, never overwritten or deleted</p>
+                    </div>
+                </div>
+
+                <div class="principle-card">
+                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                        <h3 style="margin: 0;">Contemporaneous</h3>
+                        <button class="dropdown-toggle" onclick="toggleDropdown(this)">▼</button>
+                    </div>
+                    <div class="definition">WHEN was it recorded?</div>
+                    <p>Records must be created at the time the event occurs, not retroactively. Real-time data entry ensures accuracy and prevents manipulation.</p>
+                    <ul>
+                        <li>Real-time data entry at point of action</li>
+                        <li>No backfilling of historical data</li>
+                        <li>System-generated timestamps</li>
+                        <li>Limited amendment windows</li>
+                    </ul>
+                    <div class="dropdown-content">
+                        <h4>Test Data Example</h4>
+                        <p><strong>Event:</strong> Batch MFG-2026-08-001 started | <strong>Recorded:</strong> 08/29/2026 08:00:15 (within 1 minute of event)</p>
+                        <p><strong>Rejection Test:</strong> Attempt to backdate entry to 08/28/2026 → System blocks and logs attempt</p>
+                        <p><strong>Amendment Window:</strong> 30-day window for corrections with full justification required</p>
+                    </div>
+                </div>
+
+                <div class="principle-card">
+                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                        <h3 style="margin: 0;">Original</h3>
+                        <button class="dropdown-toggle" onclick="toggleDropdown(this)">▼</button>
+                    </div>
+                    <div class="definition">Is this the first/primary record?</div>
+                    <p>The original record must be preserved and protected. Copies or data transfers must be properly identified and verified.</p>
+                    <ul>
+                        <li>Primary source documents retained</li>
+                        <li>Digital signatures on copies</li>
+                        <li>Chain of custody documentation</li>
+                        <li>Version control and data lineage</li>
+                    </ul>
+                    <div class="dropdown-content">
+                        <h4>Test Data Example</h4>
+                        <p><strong>Original:</strong> Batch Record BR-001 created 08/20/2026, marked as ORIGINAL</p>
+                        <p><strong>Copy:</strong> BR-001_COPY_Archive created 08/25/2026, digitally signed by DSmith001</p>
+                        <p><strong>Chain of Custody:</strong> Original → Regulatory Review → Compliance Verified → Archive (all logged)</p>
+                    </div>
+                </div>
+
+                <div class="principle-card">
+                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                        <h3 style="margin: 0;">Accurate</h3>
+                        <button class="dropdown-toggle" onclick="toggleDropdown(this)">▼</button>
+                    </div>
+                    <div class="definition">Is the data correct?</div>
+                    <p>Data must be verified for accuracy through established procedures, training, and error detection mechanisms.</p>
+                    <ul>
+                        <li>Documented SOPs for data entry</li>
+                        <li>Verification and validation protocols</li>
+                        <li>Staff training and competency</li>
+                        <li>Error investigation and CAPA</li>
+                    </ul>
+                    <div class="dropdown-content">
+                        <h4>📋 Test Data - Accurate Principle</h4>
+                        <p><strong>Test 1 - Assay Validation:</strong> Result: 98.5% ± 2.0% | Verified by: RBrown001 | Date: 08/29/2026 | Status: ✓ PASS</p>
+                        <p><strong>Test 2 - Range Check:</strong> System validates 95-105% acceptable range | Formula validated against USP | Status: ✓ PASS</p>
+                        <p><strong>Test 3 - Error Correction:</strong> Original 98.5% → Amended to 98.7% | Justification: Recalibration required | Approver: QAMgr001 | Status: ✓ PASS</p>
+                        <p><strong>Test 4 - Invalid Entry:</strong> Entered value 150% → System blocks entry (outside range) | Error logged | Status: ✓ PASS</p>
+                        <button class="btn" onclick="loadDashboardData('accurate')" style="margin-top: 10px; font-size: 0.85em; padding: 8px 15px;">View on Dashboard</button>
+                    </div>
+                </div>
+
+                <div class="principle-card">
+                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                        <h3 style="margin: 0;">Complete</h3>
+                        <button class="dropdown-toggle" onclick="toggleDropdown(this)">▼</button>
+                    </div>
+                    <div class="definition">Are all required fields captured?</div>
+                    <p>All mandatory information must be recorded with no missing data. Supporting documentation must be included and linked.</p>
+                    <ul>
+                        <li>Mandatory field requirements in systems</li>
+                        <li>All supporting attachments included</li>
+                        <li>Cross-reference documentation</li>
+                        <li>Reconciliation of all data elements</li>
+                    </ul>
+                    <div class="dropdown-content">
+                        <h4>📋 Test Data - Complete Principle</h4>
+                        <p><strong>Test 1 - Batch Record:</strong> Fields: Batch#, Date, Operator, Temp, Pressure, Result - ALL populated | Status: ✓ PASS</p>
+                        <p><strong>Test 2 - Supporting Docs:</strong> Linked: Calibration cert, SOP ref, Lab results, QA approval, CAPA (5 docs total) | Status: ✓ PASS</p>
+                        <p><strong>Test 3 - Missing Field:</strong> Submit without operator name → System rejects submission | Error message: "Operator required" | Status: ✓ PASS</p>
+                        <p><strong>Test 4 - Reconciliation:</strong> All line items sum to batch total | Variance check: 0% | Status: ✓ PASS</p>
+                        <button class="btn" onclick="loadDashboardData('complete')" style="margin-top: 10px; font-size: 0.85em; padding: 8px 15px;">View on Dashboard</button>
+                    </div>
+                </div>
+
+                <div class="principle-card">
+                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                        <h3 style="margin: 0;">Consistent</h3>
+                        <button class="dropdown-toggle" onclick="toggleDropdown(this)">▼</button>
+                    </div>
+                    <div class="definition">Is data uniform across systems?</div>
+                    <p>The same data must be consistent across all systems and locations where it appears, with reconciliation and verification.</p>
+                    <ul>
+                        <li>Data integration and reconciliation</li>
+                        <li>Standardized data formats</li>
+                        <li>Cross-system validation</li>
+                        <li>Master data management</li>
+                    </ul>
+                    <div class="dropdown-content">
+                        <h4>Test Data Example</h4>
+                        <p><strong>Test 1 - Multi-System Sync:</strong> Data updated in System A → System B reflects change within 5 minutes | Status: ✓ PASS</p>
+                        <p><strong>Test 2 - Data Format:</strong> Same data format across all systems | Reconciliation: daily automated | Status: ✓ PASS</p>
+                        <p><strong>Test 3 - GL Reconciliation:</strong> GL vs sub-ledger variance check | Tolerance: 0% | Status: ✓ PASS</p>
+                        <button class="btn" onclick="loadDashboardData('consistent')" style="margin-top: 10px; font-size: 0.85em; padding: 8px 15px;">View on Dashboard</button>
+                    </div>
+                </div>
+
+                <div class="principle-card">
+                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                        <h3 style="margin: 0;">Enduring</h3>
+                        <button class="dropdown-toggle" onclick="toggleDropdown(this)">▼</button>
+                    </div>
+                    <div class="definition">Will records persist long-term?</div>
+                    <p>Records must be protected, backed up, and retained for the required period with integrity assured throughout.</p>
+                    <ul>
+                        <li>Secure data storage and encryption</li>
+                        <li>Regular backup procedures</li>
+                        <li>Disaster recovery plans</li>
+                        <li>Retention policy compliance</li>
+                    </ul>
+                    <div class="dropdown-content">
+                        <h4>Test Data Example</h4>
+                        <p><strong>Test 1 - Backup Integrity:</strong> Daily backup performed | Recovery test successful | Data restored without corruption | Status: ✓ PASS</p>
+                        <p><strong>Test 2 - Retention Policy:</strong> Documents retained per ICH guideline (min 5 years) | Archive status: active | Status: ✓ PASS</p>
+                        <p><strong>Test 3 - Disaster Recovery:</strong> System failure recovery time: 2 hours | RTO: met | RPO: met | Status: ✓ PASS</p>
+                        <button class="btn" onclick="loadDashboardData('enduring')" style="margin-top: 10px; font-size: 0.85em; padding: 8px 15px;">View on Dashboard</button>
+                    </div>
+                </div>
+
+                <div class="principle-card">
+                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                        <h3 style="margin: 0;">Available</h3>
+                        <button class="dropdown-toggle" onclick="toggleDropdown(this)">▼</button>
+                    </div>
+                    <div class="definition">Can authorized users access records?</div>
+                    <p>Authorized personnel must be able to retrieve and review records efficiently while maintaining security and access controls.</p>
+                    <ul>
+                        <li>User access controls and permissions</li>
+                        <li>Efficient search and retrieval systems</li>
+                        <li>Audit trail review capabilities</li>
+                        <li>System performance and uptime</li>
+                    </ul>
+                    <div class="dropdown-content">
+                        <h4>Test Data Example</h4>
+                        <p><strong>Test 1 - Access Control:</strong> Unauthorized user access attempt → System denies, logs attempt | Status: ✓ PASS</p>
+                        <p><strong>Test 2 - Search Retrieval:</strong> Retrieve batch record from 2 years ago | Time: <1 second | Status: ✓ PASS</p>
+                        <p><strong>Test 3 - System Uptime:</strong> Monthly availability: 99.8% | SLA: 99.5% | Status: ✓ PASS</p>
+                        <p><strong>Test 4 - Authorized Access:</strong> QA user retrieves assigned records | Audit trail complete | Status: ✓ PASS</p>
+                        <button class="btn" onclick="loadDashboardData('available')" style="margin-top: 10px; font-size: 0.85em; padding: 8px 15px;">View on Dashboard</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Implementation Tab -->
+        <div id="checklist" class="tab-content">
+            <div class="implementation-section">
+                <h3>ALCOA+ Implementation Roadmap</h3>
+                <p>Follow this structured approach to implement ALCOA+ principles across your operations:</p>
+            </div>
+
+            <div class="checklist">
+                <h3>Phase 1: Assessment & Planning (Weeks 1-2)</h3>
+                <label class="checklist-item">
+                    <input type="checkbox">
+                    <span class="checklist-text">Conduct data integrity risk assessment across all operational areas</span>
+                </label>
+                <label class="checklist-item">
+                    <input type="checkbox">
+                    <span class="checklist-text">Identify critical systems, processes, and data touchpoints</span>
+                </label>
+                <label class="checklist-item">
+                    <input type="checkbox">
+                    <span class="checklist-text">Establish ALCOA+ governance structure and accountability</span>
+                </label>
+                <label class="checklist-item">
+                    <input type="checkbox">
+                    <span class="checklist-text">Define implementation timeline and resource requirements</span>
+                </label>
+                <label class="checklist-item">
+                    <input type="checkbox">
+                    <span class="checklist-text">Communicate program objectives to all stakeholders</span>
+                </label>
+            </div>
+
+            <div class="checklist">
+                <h3>Phase 2: Policy Development (Weeks 3-6)</h3>
+                <label class="checklist-item">
+                    <input type="checkbox">
+                    <span class="checklist-text">Develop or update Data Integrity Policy</span>
+                </label>
+                <label class="checklist-item">
+                    <input type="checkbox">
+                    <span class="checklist-text">Create ALCOA+ SOPs for all critical processes</span>
+                </label>
+                <label class="checklist-item">
+                    <input type="checkbox">
+                    <span class="checklist-text">Define system access controls and user roles</span>
+                </label>
+                <label class="checklist-item">
+                    <input type="checkbox">
+                    <span class="checklist-text">Establish record retention and archival procedures</span>
+                </label>
+                <label class="checklist-item">
+                    <input type="checkbox">
+                    <span class="checklist-text">Document amendment and deviation procedures</span>
+                </label>
+            </div>
+
+            <div class="checklist">
+                <h3>Phase 3: System Enhancement (Weeks 7-12)</h3>
+                <label class="checklist-item">
+                    <input type="checkbox">
+                    <span class="checklist-text">Implement mandatory field validation in systems</span>
+                </label>
+                <label class="checklist-item">
+                    <input type="checkbox">
+                    <span class="checklist-text">Configure electronic signature capabilities</span>
+                </label>
+                <label class="checklist-item">
+                    <input type="checkbox">
+                    <span class="checklist-text">Enable comprehensive audit logging (user, timestamp, change)</span>
+                </label>
+                <label class="checklist-item">
+                    <input type="checkbox">
+                    <span class="checklist-text">Set up automated backup and disaster recovery</span>
+                </label>
+                <label class="checklist-item">
+                    <input type="checkbox">
+                    <span class="checklist-text">Implement data reconciliation protocols</span>
+                </label>
+                <label class="checklist-item">
+                    <input type="checkbox">
+                    <span class="checklist-text">Configure appropriate access controls and permissions</span>
+                </label>
+            </div>
+
+            <div class="checklist">
+                <h3>Phase 4: Training & Communication (Weeks 13-16)</h3>
+                <label class="checklist-item">
+                    <input type="checkbox">
+                    <span class="checklist-text">Develop role-specific training materials</span>
+                </label>
+                <label class="checklist-item">
+                    <input type="checkbox">
+                    <span class="checklist-text">Conduct ALCOA+ training for all relevant personnel</span>
+                </label>
+                <label class="checklist-item">
+                    <input type="checkbox">
+                    <span class="checklist-text">Document training completion and competency assessments</span>
+                </label>
+                <label class="checklist-item">
+                    <input type="checkbox">
+                    <span class="checklist-text">Create quick-reference guides for teams</span>
+                </label>
+                <label class="checklist-item">
+                    <input type="checkbox">
+                    <span class="checklist-text">Establish ongoing communication channels</span>
+                </label>
+            </div>
+
+            <div class="checklist">
+                <h3>Phase 5: Testing & Validation (Weeks 17-20)</h3>
+                <label class="checklist-item">
+                    <input type="checkbox">
+                    <span class="checklist-text">Perform end-to-end system testing</span>
+                </label>
+                <label class="checklist-item">
+                    <input type="checkbox">
+                    <span class="checklist-text">Conduct data integrity testing scenarios</span>
+                </label>
+                <label class="checklist-item">
+                    <input type="checkbox">
+                    <span class="checklist-text">Validate audit trail completeness and accuracy</span>
+                </label>
+                <label class="checklist-item">
+                    <input type="checkbox">
+                    <span class="checklist-text">Test backup and recovery procedures</span>
+                </label>
+                <label class="checklist-item">
+                    <input type="checkbox">
+                    <span class="checklist-text">Perform system performance and security assessments</span>
+                </label>
+            </div>
+
+            <div class="checklist">
+                <h3>Phase 6: Deployment & Monitoring (Weeks 21-24)</h3>
+                <label class="checklist-item">
+                    <input type="checkbox">
+                    <span class="checklist-text">Go-live and implement ALCOA+ controls</span>
+                </label>
+                <label class="checklist-item">
+                    <input type="checkbox">
+                    <span class="checklist-text">Monitor compliance metrics and KPIs</span>
+                </label>
+                <label class="checklist-item">
+                    <input type="checkbox">
+                    <span class="checklist-text">Establish audit schedule and procedures</span>
+                </label>
+                <label class="checklist-item">
+                    <input type="checkbox">
+                    <span class="checklist-text">Conduct post-implementation review</span>
+                </label>
+                <label class="checklist-item">
+                    <input type="checkbox">
+                    <span class="checklist-text">Document lessons learned and best practices</span>
+                </label>
+            </div>
+
+            <div class="implementation-section">
+                <h3>Key Implementation Roles</h3>
+                <h4>ALCOA+ Program Lead</h4>
+                <p>Oversees the entire implementation, coordinates with all departments, and ensures timely completion of milestones.</p>
+
+                <h4>Data Integrity Champion (per Department)</h4>
+                <p>Serves as the subject matter expert for their department, drives adoption, and supports training and compliance.</p>
+
+                <h4>IT/System Administrator</h4>
+                <p>Configures system controls, manages access permissions, and ensures technical requirements are met.</p>
+
+                <h4>Quality Assurance</h4>
+                <p>Reviews procedures, conducts testing, and verifies compliance with ALCOA+ standards.</p>
+
+                <h4>Training & Documentation</h4>
+                <p>Develops materials, conducts training sessions, and maintains documentation current.</p>
+            </div>
+        </div>
+
+        <!-- Resources Tab -->
+        <div id="resources" class="tab-content">
+            <div class="implementation-section">
+                <h3>Implementation Support & Resources</h3>
+                <p>These tools and resources will help guide your ALCOA+ implementation journey:</p>
+            </div>
+
+            <div class="resources-grid">
+                <div class="resource-card">
+                    <h4>Data Integrity Policy Template</h4>
+                    <p>Comprehensive policy template covering all ALCOA+ principles, compliance requirements, and organizational responsibilities.</p>
+                    <button class="btn" onclick="alert('Please contact your Quality Assurance department for the policy template.')">Access</button>
+                </div>
+
+                <div class="resource-card">
+                    <h4>SOP Development Guides</h4>
+                    <p>Step-by-step guides for creating Standard Operating Procedures for critical data integrity processes.</p>
+                    <button class="btn" onclick="alert('Please consult with your operations leadership for SOP templates and guidelines.')">Access</button>
+                </div>
+
+                <div class="resource-card">
+                    <h4>Training Material Library</h4>
+                    <p>Role-specific training content, videos, and competency assessments for all operational teams.</p>
+                    <button class="btn" onclick="alert('Training materials available through your HR/Learning Management System.')">Access</button>
+                </div>
+
+                <div class="resource-card">
+                    <h4>System Configuration Guides</h4>
+                    <p>Technical documentation for configuring audit trails, access controls, and validation rules in systems.</p>
+                    <button class="btn" onclick="alert('Contact your IT department or system administrator for configuration guidance.')">Access</button>
+                </div>
+
+                <div class="resource-card">
+                    <h4>Risk Assessment Worksheet</h4>
+                    <p>Tools for identifying data integrity risks, scoring, and prioritizing remediation activities.</p>
+                    <button class="btn" onclick="alert('Risk assessment templates available from Quality Assurance.')">Access</button>
+                </div>
+
+                <div class="resource-card">
+                    <h4>Audit & Inspection Checklist</h4>
+                    <p>Comprehensive internal audit checklists to verify ALCOA+ compliance across all areas.</p>
+                    <button class="btn" onclick="alert('Audit checklists available through the Compliance Office.')">Access</button>
+                </div>
+            </div>
+
+            <div class="implementation-section">
+                <h3>Regulatory References</h3>
+                <h4>FDA Guidance Documents</h4>
+                <ul>
+                    <li><strong>21 CFR Part 11:</strong> Electronic Records; Electronic Signatures</li>
+                    <li><strong>FDA Guidance for Industry:</strong> Part 11, Electronic Records; Electronic Signatures – Scope and Application (2015)</li>
+                    <li><strong>FDA Warning Letters:</strong> Data integrity issues in pharmaceutical manufacturing</li>
+                </ul>
+
+                <h4>International Standards</h4>
+                <ul>
+                    <li><strong>ICH Q14:</strong> Analytical Procedure Development</li>
+                    <li><strong>EMA Guidelines:</strong> GMP Inspection Data Integrity Guidance</li>
+                    <li><strong>ISO/IEC 27001:</strong> Information Security Management</li>
+                </ul>
+
+                <h4>Industry Best Practices</h4>
+                <ul>
+                    <li>APIC/ASEAN Pharmaceutical Inspection Convention Guidelines</li>
+                    <li>PDA Technical Report: A Practitioner's Guide to ALCOA+</li>
+                    <li>ISPE GAMP Guide for Validation of Automated Systems</li>
+                </ul>
+            </div>
+
+            <div class="implementation-section">
+                <h3>Common Audit Findings & Preventive Measures</h3>
+
+                <h4>❌ Finding: Missing or Incomplete Audit Trails</h4>
+                <p><strong>Prevention:</strong> Implement system-enforced audit logging, regular audits of audit trail functionality, and staff training on the importance of complete records.</p>
+
+                <h4>❌ Finding: Retroactive Data Entry or Modification</h4>
+                <p><strong>Prevention:</strong> Enforce real-time data entry through system design, disable backdating capabilities, and require written justification for any amendments.</p>
+
+                <h4>❌ Finding: Inadequate User Access Controls</h4>
+                <p><strong>Prevention:</strong> Implement role-based access control, regular access reviews, segregation of duties, and periodic competency verification.</p>
+
+                <h4>❌ Finding: Insufficient Training Documentation</h4>
+                <p><strong>Prevention:</strong> Develop comprehensive training programs, maintain records of training completion, conduct competency assessments, and provide refresher training.</p>
+
+                <h4>❌ Finding: No System Validation or Change Control</h4>
+                <p><strong>Prevention:</strong> Establish rigorous validation and change control procedures, document all system changes, and verify system integrity after updates.</p>
+
+                <h4>❌ Finding: Inadequate Data Backup and Recovery</h4>
+                <p><strong>Prevention:</strong> Implement automated backup procedures, test recovery regularly, maintain offsite backups, and document disaster recovery plans.</p>
+            </div>
+
+            <div class="alert success-alert">
+                <strong>Success Tip:</strong> Establish a Data Integrity Council that meets regularly to review compliance metrics, address findings, and drive continuous improvement across the organization.
+            </div>
+        </div>
+
+        <!-- Search & Filter Tab -->
+        <div id="search" class="tab-content">
+            <div class="implementation-section">
+                <h3>Advanced Search & Filter</h3>
+                <p>Find specific content across the entire framework with our powerful search and filtering capabilities.</p>
+            </div>
+
+            <div class="search-container">
+                <div class="search-input-group">
+                    <input type="text" class="search-input" id="searchInput" placeholder="Search principles, test cases, resources..." onkeyup="searchManager.search()">
+                    <div class="autocomplete-dropdown" id="autocompleteDropdown"></div>
+                </div>
+                <div class="filter-panel">
+                    <h4>Filter Results</h4>
+                    <div class="filter-group">
+                        <label><input type="checkbox" id="filterPrinciples" onchange="searchManager.search()"> Principles</label>
+                        <label><input type="checkbox" id="filterTests" onchange="searchManager.search()" checked> Test Cases</label>
+                        <label><input type="checkbox" id="filterResources" onchange="searchManager.search()"> Resources</label>
+                    </div>
+                </div>
+            </div>
+
+            <div id="searchResults" class="search-results"></div>
+        </div>
+
+        <!-- Assessment Quiz Tab -->
+        <div id="quiz" class="tab-content">
+            <div class="quiz-container">
+                <div class="implementation-section">
+                    <h3>ALCOA+ Assessment Quiz</h3>
+                    <p>Test your knowledge of ALCOA+ principles and implementation. Complete the full assessment to earn a certificate of completion.</p>
+                </div>
+
+                <div id="quizModeSelector" class="quiz-mode-selector">
+                    <div class="quiz-mode-card" onclick="quizManager.startQuiz('full')">
+                        <h4>Full Assessment</h4>
+                        <p>25 questions covering all principles. Earn a certificate with 70%+ score.</p>
+                    </div>
+                    <div class="quiz-mode-card" onclick="quizManager.startQuiz('practice')">
+                        <h4>Practice Mode</h4>
+                        <p>Review mode with immediate feedback. No time limit.</p>
+                    </div>
+                    <div class="quiz-mode-card" onclick="quizManager.viewResults()">
+                        <h4>View Results</h4>
+                        <p>Review your previous quiz attempts and certificates.</p>
+                    </div>
+                </div>
+
+                <div id="quizContent" style="display: none;">
+                    <div class="quiz-progress-bar">
+                        <div class="quiz-progress-fill" id="quizProgressFill" style="width: 0%"></div>
+                    </div>
+
+                    <div id="questionContainer"></div>
+
+                    <div id="quizResults" style="display: none;">
+                        <div class="score-card">
+                            <h3 id="finalScore">88%</h3>
+                            <p>Quiz Completed</p>
+                        </div>
+
+                        <div id="certificateContainer"></div>
+
+                        <div style="text-align: center; margin-top: 30px;">
+                            <button class="btn" onclick="quizManager.reset()">Take Another Quiz</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Progress Dashboard Tab -->
+        <div id="progress" class="tab-content">
+            <div class="implementation-section">
+                <h3>Implementation Progress Dashboard</h3>
+                <p>Track your organization's progress through the ALCOA+ implementation phases.</p>
+            </div>
+
+            <div class="progress-timeline">
+                <h3>6-Phase Implementation Timeline</h3>
+                <div id="progressPhases"></div>
+            </div>
+
+            <div class="implementation-section">
+                <h3>Training Completion Status</h3>
+            </div>
+
+            <div class="training-gauge" id="trainingGauge"></div>
+
+            <div class="implementation-section">
+                <h3>System Audit Completion</h3>
+                <p>Status of ALCOA+ audits across different systems:</p>
+                <div class="data-table">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>System/Scenario</th>
+                                <th>Target</th>
+                                <th>Completed</th>
+                                <th>Completion %</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody id="auditStatusTable"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Export Modal -->
+        <div class="modal" id="exportModal">
+            <div class="modal-content">
+                <h3>Export Dashboard Data</h3>
+                <div class="modal-options">
+                    <div class="export-option" onclick="exportManager.exportCSV()">
+                        <strong>CSV</strong>
+                        <small>Spreadsheet format</small>
+                    </div>
+                    <div class="export-option" onclick="exportManager.exportJSON()">
+                        <strong>JSON</strong>
+                        <small>Raw data format</small>
+                    </div>
+                    <div class="export-option" onclick="exportManager.exportHTML()">
+                        <strong>HTML</strong>
+                        <small>Shareable report</small>
+                    </div>
+                    <div class="export-option" onclick="exportManager.exportPrint()">
+                        <strong>PDF</strong>
+                        <small>Print-friendly</small>
+                    </div>
+                </div>
+                <div class="modal-actions">
+                    <button class="modal-btn secondary" onclick="exportManager.closeModal()">Cancel</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="footer">
+        <p>ALCOA+ Data Integrity Framework | Eli Lilly & Company Operations</p>
+        <p>For questions or support, contact your Quality Assurance or Compliance Office</p>
+        <p style="margin-top: 15px; opacity: 0.8;">Last Updated: 2026 | Version 1.0</p>
+    </div>
+
+    <script>
+        const testDataScenarios = {
+            baseline: {
+                compliance: 94,
+                systemsAudited: "12/15",
+                criticalFindings: 2,
+                personnelTrained: "87/95",
+                data: {
+                    attributable: 98,
+                    legible: 96,
+                    contemporaneous: 87,
+                    original: 95,
+                    accurate: 92,
+                    complete: 91,
+                    consistent: 85,
+                    enduring: 99,
+                    available: 94
+                },
+                testCases: [
+                    { name: "Audit Trail Generation", principle: "Attributable", testCase: "User creates record with timestamp", expected: "User ID + timestamp logged", status: "Pass" },
+                    { name: "Amendment Tracking", principle: "Legible", testCase: "User amends existing record", expected: "Original + new value visible", status: "Pass" },
+                    { name: "Real-Time Entry Validation", principle: "Contemporaneous", testCase: "Attempt backdated entry", expected: "System rejects backdated data", status: "Pass" },
+                    { name: "Original Record Preservation", principle: "Original", testCase: "Create and copy record", expected: "Original marked; copy identified", status: "Pass" },
+                    { name: "Data Validation Rules", principle: "Accurate", testCase: "Enter invalid data format", expected: "System prevents invalid entry", status: "Partial" },
+                    { name: "Mandatory Fields", principle: "Complete", testCase: "Submit record missing field", expected: "System requires all fields", status: "Pass" },
+                    { name: "Cross-System Sync", principle: "Consistent", testCase: "Update data in System A", expected: "System B reflects change within 5 min", status: "Fail" },
+                    { name: "Backup Integrity", principle: "Enduring", testCase: "Restore from backup", expected: "All data restored without corruption", status: "Pass" },
+                    { name: "Access Control", principle: "Available", testCase: "Unauthorized user accesses record", expected: "Access denied; logged", status: "Pass" }
+                ]
+            },
+            manufacturing: {
+                compliance: 89,
+                systemsAudited: "8/15",
+                criticalFindings: 3,
+                personnelTrained: "72/95",
+                data: {
+                    attributable: 92,
+                    legible: 94,
+                    contemporaneous: 78,
+                    original: 88,
+                    accurate: 85,
+                    complete: 83,
+                    consistent: 72,
+                    enduring: 96,
+                    available: 87
+                },
+                testCases: [
+                    { name: "Batch Record Creation", principle: "Attributable", testCase: "Operator enters batch start", expected: "Operator ID + timestamp logged", status: "Pass" },
+                    { name: "Temperature Recording", principle: "Legible", testCase: "Temperature reading at 72.3°C", expected: "Value permanently recorded, readable", status: "Pass" },
+                    { name: "Real-Time Monitoring", principle: "Contemporaneous", testCase: "System records sensor data continuously", expected: "Data timestamped within 1 second of event", status: "Fail" },
+                    { name: "Raw Data Retention", principle: "Original", testCase: "Sensor data archived", expected: "Raw data preserved separately from calculations", status: "Pass" },
+                    { name: "Calculation Verification", principle: "Accurate", testCase: "Verify assay calculations", expected: "Formula audited, results within tolerance", status: "Partial" },
+                    { name: "All Parameters Recorded", principle: "Complete", testCase: "Batch completion checklist", expected: "100% of required parameters present", status: "Pass" },
+                    { name: "System A to System B Sync", principle: "Consistent", testCase: "Batch data in ERP vs MES", expected: "Data synchronized within 5 minutes", status: "Fail" },
+                    { name: "Disaster Recovery Test", principle: "Enduring", testCase: "System failure recovery", expected: "No data loss after recovery", status: "Pass" },
+                    { name: "Batch Access Control", principle: "Available", testCase: "QA reviews batch record", expected: "Access logged, audit trail complete", status: "Pass" }
+                ]
+            },
+            quality: {
+                compliance: 96,
+                systemsAudited: "14/15",
+                criticalFindings: 0,
+                personnelTrained: "94/95",
+                data: {
+                    attributable: 99,
+                    legible: 98,
+                    contemporaneous: 94,
+                    original: 97,
+                    accurate: 96,
+                    complete: 95,
+                    consistent: 92,
+                    enduring: 99,
+                    available: 97
+                },
+                testCases: [
+                    { name: "QA Sign-off", principle: "Attributable", testCase: "QA approves batch", expected: "Approver name + digital signature + timestamp", status: "Pass" },
+                    { name: "Test Report Legibility", principle: "Legible", testCase: "Lab test results formatted", expected: "Clear formatting, no redactions or erasures", status: "Pass" },
+                    { name: "Real-Time Test Entry", principle: "Contemporaneous", testCase: "HPLC results logged", expected: "Data entered at completion, no backfilling", status: "Pass" },
+                    { name: "Original Test Data", principle: "Original", testCase: "Raw chromatography files", expected: "Original instrument files retained separately", status: "Pass" },
+                    { name: "Result Accuracy", principle: "Accurate", testCase: "Reference standards validated", expected: "All results within acceptance criteria", status: "Pass" },
+                    { name: "Complete Test Report", principle: "Complete", testCase: "All test parameters documented", expected: "No missing data, COAs complete", status: "Pass" },
+                    { name: "Multi-System Consistency", principle: "Consistent", testCase: "LIMS to ERP data match", expected: "100% data consistency verified", status: "Pass" },
+                    { name: "Archive Integrity", principle: "Enduring", testCase: "Long-term storage of results", expected: "All records preserved for 10+ years", status: "Pass" },
+                    { name: "Result Access", principle: "Available", testCase: "Retrieve historical test results", expected: "Fast retrieval, complete audit trail", status: "Pass" }
+                ]
+            },
+            lims: {
+                compliance: 91,
+                systemsAudited: "11/15",
+                criticalFindings: 1,
+                personnelTrained: "85/95",
+                data: {
+                    attributable: 95,
+                    legible: 95,
+                    contemporaneous: 88,
+                    original: 93,
+                    accurate: 90,
+                    complete: 89,
+                    consistent: 86,
+                    enduring: 98,
+                    available: 92
+                },
+                testCases: [
+                    { name: "Sample Registration", principle: "Attributable", testCase: "Sample logged into LIMS", expected: "Sample ID + operator + timestamp recorded", status: "Pass" },
+                    { name: "Data Display Format", principle: "Legible", testCase: "Results displayed in LIMS", expected: "Clear formatting, proper units, searchable", status: "Pass" },
+                    { name: "Instrument Integration", principle: "Contemporaneous", testCase: "Chromatograph data import", expected: "Automatic data import with real-time timestamp", status: "Partial" },
+                    { name: "Raw Instrument Files", principle: "Original", testCase: "Store raw .ch files", expected: "Original files linked to sample record", status: "Pass" },
+                    { name: "Data Validation Rules", principle: "Accurate", testCase: "Range checks on results", expected: "Out-of-spec values flagged", status: "Pass" },
+                    { name: "Required Fields", principle: "Complete", testCase: "Sample tracking fields", expected: "All fields mandatory before approval", status: "Pass" },
+                    { name: "ERP Integration", principle: "Consistent", testCase: "LIMS to batch system sync", expected: "Data consistency verified hourly", status: "Fail" },
+                    { name: "Database Backups", principle: "Enduring", testCase: "Daily backup validation", expected: "Full backup integrity verified", status: "Pass" },
+                    { name: "User Access Levels", principle: "Available", testCase: "Role-based access to results", expected: "Users see only authorized data", status: "Pass" }
+                ]
+            },
+            erp: {
+                compliance: 90,
+                systemsAudited: "10/15",
+                criticalFindings: 2,
+                personnelTrained: "82/95",
+                data: {
+                    attributable: 93,
+                    legible: 94,
+                    contemporaneous: 85,
+                    original: 92,
+                    accurate: 88,
+                    complete: 87,
+                    consistent: 80,
+                    enduring: 97,
+                    available: 90
+                },
+                testCases: [
+                    { name: "Purchase Order Creation", principle: "Attributable", testCase: "PO created in ERP", expected: "Creator logged with timestamp", status: "Pass" },
+                    { name: "Invoice Display", principle: "Legible", testCase: "Invoice formatting", expected: "All data clearly visible and readable", status: "Pass" },
+                    { name: "Transaction Timestamps", principle: "Contemporaneous", testCase: "Order timestamp accuracy", expected: "Timestamp at creation, no backdating", status: "Partial" },
+                    { name: "Audit Log Storage", principle: "Original", testCase: "Original transaction logged", expected: "Changes tracked with original preserved", status: "Pass" },
+                    { name: "Amount Validations", principle: "Accurate", testCase: "Price validation rules", expected: "Prices validated against contracts", status: "Pass" },
+                    { name: "Mandatory PO Fields", principle: "Complete", testCase: "All required fields present", expected: "Cannot save PO with missing data", status: "Pass" },
+                    { name: "System Reconciliation", principle: "Consistent", testCase: "GL vs sub-ledger match", expected: "Automatic reconciliation daily", status: "Fail" },
+                    { name: "Database Redundancy", principle: "Enduring", testCase: "Data backup and recovery", expected: "No data loss in failover scenario", status: "Pass" },
+                    { name: "Report Access", principle: "Available", testCase: "Financial reports access", expected: "Authorized users can retrieve reports", status: "Pass" }
+                ]
+            }
+        };
+
+        function loadTestScenario() {
+            const scenario = document.getElementById('scenarioSelector').value;
+            const data = testDataScenarios[scenario];
+
+            // Update KPIs
+            document.querySelectorAll('.dashboard-grid .kpi-value')[0].textContent = data.compliance + '%';
+            document.querySelectorAll('.dashboard-grid .kpi-value')[1].textContent = data.systemsAudited;
+            document.querySelectorAll('.dashboard-grid .kpi-value')[2].textContent = data.criticalFindings;
+            document.querySelectorAll('.dashboard-grid .kpi-value')[3].textContent = data.personnelTrained;
+
+            // Update compliance chart
+            const principleNames = Object.keys(data.data);
+            const chartBars = document.querySelectorAll('.chart-bar');
+
+            principleNames.forEach((principle, index) => {
+                if (chartBars[index]) {
+                    const percentage = data.data[principle];
+                    const barFill = chartBars[index].querySelector('.chart-bar-fill');
+                    const valueSpan = chartBars[index].querySelector('.chart-value');
+
+                    barFill.style.width = percentage + '%';
+                    valueSpan.textContent = percentage + '%';
+
+                    barFill.className = 'chart-bar-fill ' + (percentage >= 90 ? 'success' : percentage >= 80 ? 'warning' : '');
+                }
+            });
+
+            // Update test cases table
+            const tbody = document.querySelector('.data-table table tbody');
+            if (tbody) {
+                tbody.innerHTML = '';
+                data.testCases.forEach(testCase => {
+                    const row = document.createElement('tr');
+                    const statusClass = testCase.status === 'Pass' ? 'pass' : testCase.status === 'Fail' ? 'fail' : 'warning';
+                    row.innerHTML = `
+                        <td><strong>${testCase.name}</strong></td>
+                        <td>${testCase.principle}</td>
+                        <td>${testCase.testCase}</td>
+                        <td>${testCase.expected}</td>
+                        <td><span class="status-badge ${statusClass}">${testCase.status}</span></td>
+                    `;
+                    tbody.appendChild(row);
+                });
+            }
+        }
+
+        function filterByPrinciple() {
+            const selectedPrinciple = document.getElementById('principleSelector').value;
+            const scenario = document.getElementById('scenarioSelector').value;
+            const data = testDataScenarios[scenario];
+            const tbody = document.querySelector('.data-table table tbody');
+
+            if (tbody && selectedPrinciple !== 'all') {
+                const filtered = data.testCases.filter(tc => tc.principle.toLowerCase() === selectedPrinciple);
+                tbody.innerHTML = '';
+                filtered.forEach(testCase => {
+                    const row = document.createElement('tr');
+                    const statusClass = testCase.status === 'Pass' ? 'pass' : testCase.status === 'Fail' ? 'fail' : 'warning';
+                    row.innerHTML = `
+                        <td><strong>${testCase.name}</strong></td>
+                        <td>${testCase.principle}</td>
+                        <td>${testCase.testCase}</td>
+                        <td>${testCase.expected}</td>
+                        <td><span class="status-badge ${statusClass}">${testCase.status}</span></td>
+                    `;
+                    tbody.appendChild(row);
+                });
+            } else {
+                loadTestScenario();
+            }
+        }
+
+        function switchTab(tabName) {
+            const tabs = document.querySelectorAll('.tab-content');
+            const buttons = document.querySelectorAll('.tab-btn');
+
+            tabs.forEach(tab => tab.classList.remove('active'));
+            buttons.forEach(btn => btn.classList.remove('active'));
+
+            document.getElementById(tabName).classList.add('active');
+            event.target.classList.add('active');
+        }
+
+        function toggleDropdown(button) {
+            button.classList.toggle('active');
+            const content = button.parentElement.nextElementSibling.nextElementSibling.nextElementSibling;
+            if (content && content.classList.contains('dropdown-content')) {
+                content.classList.toggle('active');
+            }
+        }
+
+        function loadDashboardData(principle) {
+            // Switch to dashboard tab
+            switchTab('dashboard');
+            // Set principle filter
+            document.getElementById('principleSelector').value = principle;
+            // Filter the test cases
+            setTimeout(() => filterByPrinciple(), 100);
+        }
+
+        // Allow checkbox labels to toggle checkboxes
+        document.querySelectorAll('.checklist-text').forEach(label => {
+            label.addEventListener('click', function() {
+                this.parentElement.querySelector('input[type="checkbox"]').click();
+            });
+        });
+
+        // ============ PHASE 2: STORAGE MANAGER ============
+        const storageManager = {
+            namespace: 'alcoa-plus',
+            save: function(key, data) {
+                const fullKey = `${this.namespace}:${key}`;
+                try {
+                    localStorage.setItem(fullKey, JSON.stringify(data));
+                } catch (e) {
+                    console.warn('localStorage save failed:', e);
+                }
+            },
+            load: function(key, defaultVal = null) {
+                const fullKey = `${this.namespace}:${key}`;
+                try {
+                    const data = localStorage.getItem(fullKey);
+                    return data ? JSON.parse(data) : defaultVal;
+                } catch (e) {
+                    console.warn('localStorage load failed:', e);
+                    return defaultVal;
+                }
+            },
+            clear: function(key) {
+                const fullKey = `${this.namespace}:${key}`;
+                localStorage.removeItem(fullKey);
+            }
+        };
+
+        // ============ PHASE 2: EXPORT MANAGER ============
+        const exportManager = {
+            showModal: function() {
+                document.getElementById('exportModal').classList.add('active');
+            },
+            closeModal: function() {
+                document.getElementById('exportModal').classList.remove('active');
+            },
+            getExportData: function() {
+                const scenario = document.getElementById('scenarioSelector').value;
+                const data = testDataScenarios[scenario];
+                return {
+                    timestamp: new Date().toISOString(),
+                    scenario: scenario,
+                    metrics: {
+                        overall: document.querySelectorAll('.kpi-value')[0].textContent,
+                        systemsAudited: document.querySelectorAll('.kpi-value')[1].textContent,
+                        criticalFindings: document.querySelectorAll('.kpi-value')[2].textContent,
+                        personnelTrained: document.querySelectorAll('.kpi-value')[3].textContent
+                    },
+                    principles: data.data,
+                    testCases: data.testCases
+                };
+            },
+            exportCSV: function() {
+                const data = this.getExportData();
+                let csv = 'ALCOA+ Compliance Report\n';
+                csv += `Generated: ${new Date().toLocaleString()}\n`;
+                csv += `Scenario: ${data.scenario}\n\n`;
+                csv += 'Metrics\n';
+                csv += `Overall Compliance,${data.metrics.overall}\n`;
+                csv += `Systems Audited,${data.metrics.systemsAudited}\n`;
+                csv += `Critical Findings,${data.metrics.criticalFindings}\n`;
+                csv += `Personnel Trained,${data.metrics.personnelTrained}\n\n`;
+                csv += 'Principles Compliance\n';
+                Object.entries(data.principles).forEach(([key, val]) => {
+                    csv += `${key},${val}%\n`;
+                });
+                csv += '\nTest Cases\n';
+                csv += 'Name,Principle,Test Case,Expected,Status\n';
+                data.testCases.forEach(tc => {
+                    csv += `"${tc.name}","${tc.principle}","${tc.testCase}","${tc.expected}","${tc.status}"\n`;
+                });
+
+                const blob = new Blob([csv], { type: 'text/csv' });
+                const url = window.URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `ALCOA_Report_${Date.now()}.csv`;
+                a.click();
+                this.closeModal();
+            },
+            exportJSON: function() {
+                const data = this.getExportData();
+                const json = JSON.stringify(data, null, 2);
+                const blob = new Blob([json], { type: 'application/json' });
+                const url = window.URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `ALCOA_Report_${Date.now()}.json`;
+                a.click();
+                this.closeModal();
+            },
+            exportHTML: function() {
+                const data = this.getExportData();
+                let html = `<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>ALCOA+ Compliance Report</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 40px; color: #333; }
+        h1 { color: #667eea; border-bottom: 3px solid #667eea; padding-bottom: 10px; }
+        h2 { color: #764ba2; margin-top: 30px; }
+        table { width: 100%; border-collapse: collapse; margin-top: 15px; }
+        th, td { border: 1px solid #ddd; padding: 12px; text-align: left; }
+        th { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; }
+        tr:nth-child(even) { background: #f5f7ff; }
+        .metric { display: inline-block; margin: 15px 30px 15px 0; }
+        .value { font-weight: bold; color: #667eea; font-size: 1.3em; }
+        .label { color: #666; font-size: 0.9em; }
+        .meta { color: #999; font-size: 0.85em; margin: 20px 0; }
+    </style>
+</head>
+<body>
+    <h1>ALCOA+ Data Integrity Compliance Report</h1>
+    <p class="meta">Generated: ${new Date().toLocaleString()}</p>
+    <p class="meta">Scenario: ${data.scenario}</p>
+
+    <h2>Key Metrics</h2>
+    <div class="metric">
+        <div class="label">Overall Compliance</div>
+        <div class="value">${data.metrics.overall}</div>
+    </div>
+    <div class="metric">
+        <div class="label">Systems Audited</div>
+        <div class="value">${data.metrics.systemsAudited}</div>
+    </div>
+    <div class="metric">
+        <div class="label">Critical Findings</div>
+        <div class="value">${data.metrics.criticalFindings}</div>
+    </div>
+    <div class="metric">
+        <div class="label">Personnel Trained</div>
+        <div class="value">${data.metrics.personnelTrained}</div>
+    </div>
+
+    <h2>Principle Compliance</h2>
+    <table>
+        <tr>
+            <th>Principle</th>
+            <th>Compliance %</th>
+        </tr>`;
+                Object.entries(data.principles).forEach(([key, val]) => {
+                    html += `<tr><td>${key}</td><td>${val}%</td></tr>`;
+                });
+                html += `</table>
+
+    <h2>Test Cases</h2>
+    <table>
+        <tr>
+            <th>Test Name</th>
+            <th>Principle</th>
+            <th>Test Case</th>
+            <th>Expected Result</th>
+            <th>Status</th>
+        </tr>`;
+                data.testCases.forEach(tc => {
+                    html += `<tr>
+            <td>${tc.name}</td>
+            <td>${tc.principle}</td>
+            <td>${tc.testCase}</td>
+            <td>${tc.expected}</td>
+            <td>${tc.status}</td>
+        </tr>`;
+                });
+                html += `</table>
+    <p class="meta">For more information, visit the ALCOA+ Framework</p>
+</body>
+</html>`;
+                const blob = new Blob([html], { type: 'text/html' });
+                const url = window.URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `ALCOA_Report_${Date.now()}.html`;
+                a.click();
+                this.closeModal();
+            },
+            exportPrint: function() {
+                window.print();
+                this.closeModal();
+            },
+            printDashboard: function() {
+                window.print();
+            }
+        };
+
+        // ============ PHASE 2: SEARCH MANAGER ============
+        const searchManager = {
+            index: {},
+            searchHistory: [],
+            buildIndex: function() {
+                this.index = {
+                    principles: [
+                        { id: 'attributable', title: 'Attributable', description: 'WHO performed the action', type: 'principle' },
+                        { id: 'legible', title: 'Legible', description: 'Is the data clear and readable', type: 'principle' },
+                        { id: 'contemporaneous', title: 'Contemporaneous', description: 'WHEN was it recorded', type: 'principle' },
+                        { id: 'original', title: 'Original', description: 'Is this the first/primary record', type: 'principle' },
+                        { id: 'accurate', title: 'Accurate', description: 'Is the data correct', type: 'principle' },
+                        { id: 'complete', title: 'Complete', description: 'Are all required fields captured', type: 'principle' },
+                        { id: 'consistent', title: 'Consistent', description: 'Is data uniform across systems', type: 'principle' },
+                        { id: 'enduring', title: 'Enduring', description: 'Will records persist long-term', type: 'principle' },
+                        { id: 'available', title: 'Available', description: 'Can authorized users access records', type: 'principle' }
+                    ],
+                    testCases: []
+                };
+
+                Object.values(testDataScenarios).forEach(scenario => {
+                    scenario.testCases.forEach(tc => {
+                        this.index.testCases.push({
+                            ...tc,
+                            type: 'test',
+                            id: tc.name.toLowerCase().replace(/\s+/g, '-')
+                        });
+                    });
+                });
+            },
+            search: function() {
+                const query = document.getElementById('searchInput').value.trim().toLowerCase();
+                if (!query) {
+                    document.getElementById('searchResults').innerHTML = '';
+                    return;
+                }
+
+                this.searchHistory = [query, ...this.searchHistory.filter(q => q !== query)].slice(0, 10);
+                storageManager.save('searchHistory', this.searchHistory);
+
+                const filterPrinciples = document.getElementById('filterPrinciples')?.checked !== false;
+                const filterTests = document.getElementById('filterTests')?.checked !== false;
+
+                let results = [];
+
+                if (filterPrinciples) {
+                    results.push(...this.index.principles.filter(p =>
+                        p.title.toLowerCase().includes(query) ||
+                        p.description.toLowerCase().includes(query)
+                    ));
+                }
+
+                if (filterTests) {
+                    results.push(...this.index.testCases.filter(t =>
+                        t.name.toLowerCase().includes(query) ||
+                        t.testCase.toLowerCase().includes(query) ||
+                        t.principle.toLowerCase().includes(query)
+                    ));
+                }
+
+                this.displayResults(results);
+            },
+            displayResults: function(results) {
+                const container = document.getElementById('searchResults');
+                if (results.length === 0) {
+                    container.innerHTML = '<p style="text-align: center; color: #999; padding: 40px;">No results found. Try a different search.</p>';
+                    return;
+                }
+
+                container.innerHTML = results.map(r => {
+                    if (r.type === 'principle') {
+                        return `
+                            <div class="result-card">
+                                <span class="type-badge">Principle</span>
+                                <h4>${r.title}</h4>
+                                <p>${r.description}</p>
+                                <div class="result-actions">
+                                    <button class="btn secondary" onclick="loadDashboardData('${r.id}')">View on Dashboard</button>
+                                </div>
+                            </div>`;
+                    } else {
+                        return `
+                            <div class="result-card">
+                                <span class="type-badge">Test Case</span>
+                                <h4>${r.name}</h4>
+                                <p>${r.testCase}</p>
+                                <div class="result-meta">
+                                    <span>Principle: <strong>${r.principle}</strong></span>
+                                    <span>Status: <strong>${r.status}</strong></span>
+                                </div>
+                                <div class="result-actions">
+                                    <button class="btn secondary" onclick="loadDashboardData('${r.principle.toLowerCase()}')">View Principle</button>
+                                </div>
+                            </div>`;
+                    }
+                }).join('');
+            }
+        };
+
+        // ============ PHASE 2: QUIZ MANAGER ============
+        const quizManager = {
+            questions: [
+                { id: 1, principle: 'Attributable', difficulty: 'beginner', question: 'What must be recorded for every data entry?', options: [{id: 'a', text: 'User ID and timestamp', correct: true}, {id: 'b', text: 'Only user ID', correct: false}, {id: 'c', text: 'Only timestamp', correct: false}, {id: 'd', text: 'Change description only', correct: false}], explanation: 'ALCOA+ requires both user identification and timestamp for complete accountability.' },
+                { id: 2, principle: 'Legible', difficulty: 'beginner', question: 'What is a key requirement for Legible data?', options: [{id: 'a', text: 'Permanent, indelible format', correct: true}, {id: 'b', text: 'Written in blue ink', correct: false}, {id: 'c', text: 'Printed immediately', correct: false}, {id: 'd', text: 'Readable only by QA', correct: false}], explanation: 'Legible data must be in permanent, indelible format that remains clear throughout its retention period.' },
+                { id: 3, principle: 'Contemporaneous', difficulty: 'beginner', question: 'When should data entry occur?', options: [{id: 'a', text: 'At the time of the event', correct: true}, {id: 'b', text: 'Within 30 days', correct: false}, {id: 'c', text: 'By end of month', correct: false}, {id: 'd', text: 'During audit only', correct: false}], explanation: 'Contemporaneous recording means data must be entered at the time the event occurs, not retroactively.' },
+                { id: 4, principle: 'Original', difficulty: 'beginner', question: 'How should copies of records be identified?', options: [{id: 'a', text: 'Marked as copy with digital signature', correct: true}, {id: 'b', text: 'No marking needed', correct: false}, {id: 'c', text: 'Stamped with red ink', correct: false}, {id: 'd', text: 'Stored separately', correct: false}], explanation: 'Original records must be preserved, and copies must be properly marked and digitally signed.' },
+                { id: 5, principle: 'Accurate', difficulty: 'intermediate', question: 'What helps ensure data accuracy?', options: [{id: 'a', text: 'Documented SOPs, verification protocols, training', correct: true}, {id: 'b', text: 'Double entry only', correct: false}, {id: 'c', text: 'Random spot checks', correct: false}, {id: 'd', text: 'Supervisor approval only', correct: false}], explanation: 'Accuracy requires multiple controls: documented procedures, verification protocols, and trained personnel.' },
+                { id: 6, principle: 'Complete', difficulty: 'beginner', question: 'What does Complete mean in ALCOA+?', options: [{id: 'a', text: 'All required fields captured with no missing data', correct: true}, {id: 'b', text: 'Record is saved', correct: false}, {id: 'c', text: 'QA has reviewed it', correct: false}, {id: 'd', text: 'At least 80% filled', correct: false}], explanation: 'Complete means all mandatory information and supporting documentation must be recorded with no gaps.' },
+                { id: 7, principle: 'Consistent', difficulty: 'intermediate', question: 'What is required for Consistent data?', options: [{id: 'a', text: 'Same data uniform across all systems with reconciliation', correct: true}, {id: 'b', text: 'Each system has its own version', correct: false}, {id: 'c', text: 'Data never changes', correct: false}, {id: 'd', text: 'Only one system stores data', correct: false}], explanation: 'Consistency requires that the same data is referenced uniformly across systems with regular reconciliation.' },
+                { id: 8, principle: 'Enduring', difficulty: 'intermediate', question: 'How should records be protected for Enduring?', options: [{id: 'a', text: 'Secure storage, backups, retention compliance', correct: true}, {id: 'b', text: 'Store on local computer', correct: false}, {id: 'c', text: 'Print copies', correct: false}, {id: 'd', text: 'Manual re-entry annually', correct: false}], explanation: 'Enduring requires secure storage, regular backups, disaster recovery plans, and retention compliance.' },
+                { id: 9, principle: 'Available', difficulty: 'beginner', question: 'What enables data to be Available?', options: [{id: 'a', text: 'Access controls, fast retrieval systems, disaster recovery', correct: true}, {id: 'b', text: 'Printed and filed', correct: false}, {id: 'c', text: 'Kept in safe deposit box', correct: false}, {id: 'd', text: 'Only managers have access', correct: false}], explanation: 'Available means authorized personnel can efficiently retrieve and review records when needed.' },
+                { id: 10, principle: 'Attributable', difficulty: 'intermediate', question: 'What is an electronic signature?', options: [{id: 'a', text: 'Digital equivalent of handwritten signature with legal validity', correct: true}, {id: 'b', text: 'Just typing your name', correct: false}, {id: 'c', text: 'A scanned image', correct: false}, {id: 'd', text: 'Optional for digital records', correct: false}], explanation: 'Electronic signatures provide legal equivalent of handwritten signatures with full accountability and non-repudiation.' },
+                { id: 11, principle: 'Implementation', difficulty: 'intermediate', question: 'How many phases are in ALCOA+ implementation?', options: [{id: 'a', text: 'Six phases over 24 weeks', correct: true}, {id: 'b', text: 'Four phases over 12 weeks', correct: false}, {id: 'c', text: 'Two phases over 8 weeks', correct: false}, {id: 'd', text: 'Continuous rolling process', correct: false}], explanation: 'The ALCOA+ implementation roadmap consists of 6 phases spanning 24 weeks.' },
+                { id: 12, principle: 'Implementation', difficulty: 'intermediate', question: 'What is Phase 1 of implementation?', options: [{id: 'a', text: 'Assessment & Planning', correct: true}, {id: 'b', text: 'Policy Development', correct: false}, {id: 'c', text: 'System Enhancement', correct: false}, {id: 'd', text: 'Training & Communication', correct: false}], explanation: 'Phase 1 focuses on conducting risk assessment and planning the implementation approach.' },
+                { id: 13, principle: 'Compliance', difficulty: 'advanced', question: 'Which regulatory body issued 21 CFR Part 11?', options: [{id: 'a', text: 'FDA', correct: true}, {id: 'b', text: 'EMA', correct: false}, {id: 'c', text: 'ICH', correct: false}, {id: 'd', text: 'PDA', correct: false}], explanation: '21 CFR Part 11 is FDA guidance on Electronic Records and Electronic Signatures.' },
+                { id: 14, principle: 'Compliance', difficulty: 'advanced', question: 'What common finding relates to data integrity?', options: [{id: 'a', text: 'Missing or incomplete audit trails', correct: true}, {id: 'b', text: 'Printed reports', correct: false}, {id: 'c', text: 'Too many backups', correct: false}, {id: 'd', text: 'Excessive training', correct: false}], explanation: 'Missing audit trails are a critical finding in FDA inspections related to data integrity.' },
+                { id: 15, principle: 'Compliance', difficulty: 'advanced', question: 'How should amendments to records be handled?', options: [{id: 'a', text: 'Original preserved, change logged with justification', correct: true}, {id: 'b', text: 'Overwritten with new data', correct: false}, {id: 'c', text: 'Deleted completely', correct: false}, {id: 'd', text: 'Corrected in place', correct: false}], explanation: 'Amendments must preserve the original data with a complete audit trail showing what changed, why, and by whom.' },
+                { id: 16, principle: 'Principles', difficulty: 'intermediate', question: 'Why is real-time entry important?', options: [{id: 'a', text: 'Prevents manipulation and ensures accuracy', correct: true}, {id: 'b', text: 'Saves storage space', correct: false}, {id: 'c', text: 'Makes reports faster', correct: false}, {id: 'd', text: 'Reduces training needs', correct: false}], explanation: 'Real-time entry prevents retroactive manipulation and ensures data accurately reflects events as they occurred.' },
+                { id: 17, principle: 'Principles', difficulty: 'advanced', question: 'What is the purpose of role-based access control?', options: [{id: 'a', text: 'Users access only data appropriate for their role', correct: true}, {id: 'b', text: 'Everyone has the same access', correct: false}, {id: 'c', text: 'Reduces the number of users', correct: false}, {id: 'd', text: 'Speeds up data entry', correct: false}], explanation: 'RBAC implements segregation of duties by restricting access based on job requirements.' },
+                { id: 18, principle: 'Principles', difficulty: 'intermediate', question: 'What triggers an audit trail entry?', options: [{id: 'a', text: 'Any action that creates, modifies, or accesses data', correct: true}, {id: 'b', text: 'Only deletions', correct: false}, {id: 'c', text: 'Only approvals', correct: false}, {id: 'd', text: 'Weekly automatically', correct: false}], explanation: 'Complete audit trails capture every action: creation, modification, access, and deletion.' },
+                { id: 19, principle: 'Implementation', difficulty: 'advanced', question: 'Which role leads ALCOA+ implementation?', options: [{id: 'a', text: 'ALCOA+ Program Lead', correct: true}, {id: 'b', text: 'Quality Manager', correct: false}, {id: 'c', text: 'IT Director', correct: false}, {id: 'd', text: 'Compliance Officer', correct: false}], explanation: 'The ALCOA+ Program Lead oversees implementation and coordinates with all departments.' },
+                { id: 20, principle: 'Compliance', difficulty: 'intermediate', question: 'What should be included in risk assessment?', options: [{id: 'a', text: 'Critical systems, processes, and data touchpoints', correct: true}, {id: 'b', text: 'Only IT systems', correct: false}, {id: 'c', text: 'Budget and staffing only', correct: false}, {id: 'd', text: 'Regulatory fines only', correct: false}], explanation: 'Comprehensive risk assessment identifies all critical areas where data integrity is essential.' },
+                { id: 21, principle: 'Principles', difficulty: 'beginner', question: 'What does ALCOA+ stand for?', options: [{id: 'a', text: 'Attributable, Legible, Contemporaneous, Original, Accurate, Complete, Consistent, Enduring, Available', correct: true}, {id: 'b', text: 'Automated Legal Compliance Outline', correct: false}, {id: 'c', text: 'Advanced Laboratory Control Options', correct: false}, {id: 'd', text: 'Automatic Line Clearance Operation', correct: false}], explanation: 'ALCOA+ comprises 9 principles representing a comprehensive data integrity framework for pharmaceutical operations.' },
+                { id: 22, principle: 'Compliance', difficulty: 'intermediate', question: 'How often should backups be performed?', options: [{id: 'a', text: 'Daily with regular recovery testing', correct: true}, {id: 'b', text: 'Weekly', correct: false}, {id: 'c', text: 'Monthly', correct: false}, {id: 'd', text: 'Only before audits', correct: false}], explanation: 'Daily backups with periodic recovery testing ensure data protection and business continuity.' },
+                { id: 23, principle: 'Implementation', difficulty: 'intermediate', question: 'What is validation in system context?', options: [{id: 'a', text: 'Documented proof that a system meets requirements', correct: true}, {id: 'b', text: 'System runs without errors', correct: false}, {id: 'c', text: 'User training completion', correct: false}, {id: 'd', text: 'Annual system update', correct: false}], explanation: 'System validation is documented evidence that equipment/systems work correctly for their intended use.' },
+                { id: 24, principle: 'Principles', difficulty: 'advanced', question: 'What is a change control procedure?', options: [{id: 'a', text: 'Formal process to modify systems with documentation and testing', correct: true}, {id: 'b', text: 'Quick software updates', correct: false}, {id: 'c', text: 'User password changes', correct: false}, {id: 'd', text: 'Operator substitutions', correct: false}], explanation: 'Change control ensures all system modifications are documented, tested, and approved before implementation.' },
+                { id: 25, principle: 'Compliance', difficulty: 'advanced', question: 'What is the minimum passing score for ALCOA+ assessment?', options: [{id: 'a', text: '70%', correct: true}, {id: 'b', text: '60%', correct: false}, {id: 'c', text: '80%', correct: false}, {id: 'd', text: '100%', correct: false}], explanation: 'A score of 70% or higher demonstrates adequate understanding of ALCOA+ principles.' }
+            ],
+            currentSession: null,
+            currentQuestion: 0,
+            answers: [],
+
+            startQuiz: function(mode = 'full') {
+                this.currentQuestion = 0;
+                this.answers = [];
+                this.currentSession = {
+                    mode: mode,
+                    startTime: Date.now(),
+                    questions: mode === 'practice' ? this.questions.slice(0, 10) : this.questions
+                };
+
+                document.getElementById('quizModeSelector').style.display = 'none';
+                document.getElementById('quizContent').style.display = 'block';
+                document.getElementById('quizResults').style.display = 'none';
+
+                this.showQuestion();
+            },
+
+            showQuestion: function() {
+                if (this.currentQuestion >= this.currentSession.questions.length) {
+                    this.showResults();
+                    return;
+                }
+
+                const q = this.currentSession.questions[this.currentQuestion];
+                const progress = ((this.currentQuestion + 1) / this.currentSession.questions.length) * 100;
+                document.getElementById('quizProgressFill').style.width = progress + '%';
+
+                const html = `
+                    <div class="question-card">
+                        <div class="question-header">
+                            <span class="question-number">Question ${this.currentQuestion + 1} of ${this.currentSession.questions.length}</span>
+                            <span class="question-difficulty">${q.difficulty}</span>
+                        </div>
+                        <div class="question-text">${q.question}</div>
+                        <div class="question-options">
+                            ${q.options.map((opt, idx) => `
+                                <button class="option-button" onclick="quizManager.selectAnswer(${idx}, ${q.id})">
+                                    ${opt.text}
+                                </button>
+                            `).join('')}
+                        </div>
+                        <div class="quiz-feedback" id="quizFeedback"></div>
+                        <div class="quiz-actions">
+                            <button class="btn" onclick="quizManager.nextQuestion()">Next Question</button>
+                        </div>
+                    </div>
+                `;
+
+                document.getElementById('questionContainer').innerHTML = html;
+            },
+
+            selectAnswer: function(optionIdx, questionId) {
+                const question = this.currentSession.questions[this.currentQuestion];
+                const selected = question.options[optionIdx];
+
+                // Mark selection
+                document.querySelectorAll('.option-button').forEach((btn, idx) => {
+                    if (idx === optionIdx) {
+                        btn.classList.add(selected.correct ? 'correct' : 'incorrect');
+                    }
+                });
+
+                // Show feedback
+                const feedback = document.getElementById('quizFeedback');
+                feedback.classList.add('active');
+                if (selected.correct) {
+                    feedback.innerHTML = `<strong>Correct!</strong> ${question.explanation}`;
+                    feedback.classList.remove('error');
+                } else {
+                    feedback.innerHTML = `<strong>Incorrect.</strong> ${question.explanation}`;
+                    feedback.classList.add('error');
+                }
+
+                // Store answer
+                this.answers[this.currentQuestion] = {
+                    questionId: questionId,
+                    selected: optionIdx,
+                    correct: selected.correct
+                };
+            },
+
+            nextQuestion: function() {
+                if (this.answers[this.currentQuestion] === undefined) {
+                    alert('Please select an answer before continuing.');
+                    return;
+                }
+                this.currentQuestion++;
+                this.showQuestion();
+            },
+
+            showResults: function() {
+                const correct = this.answers.filter(a => a.correct).length;
+                const percentage = Math.round((correct / this.answers.length) * 100);
+                const passed = percentage >= 70;
+
+                const result = {
+                    date: new Date().toLocaleString(),
+                    mode: this.currentSession.mode,
+                    totalQuestions: this.answers.length,
+                    correct: correct,
+                    percentage: percentage,
+                    passed: passed
+                };
+
+                storageManager.save('quizResults', [result, ...(storageManager.load('quizResults') || [])].slice(0, 20));
+
+                document.getElementById('quizContent').style.display = 'none';
+                document.getElementById('quizResults').style.display = 'block';
+                document.getElementById('finalScore').innerHTML = percentage + '%';
+
+                let certHtml = '';
+                if (passed) {
+                    certHtml = `
+                        <div class="certificate">
+                            <div class="certificate-header">Certificate of Completion</div>
+                            <div class="certificate-content">
+                                <p>This certifies that you have successfully completed</p>
+                                <p style="font-size: 1.3em; color: #667eea; font-weight: 700;">ALCOA+ Data Integrity Assessment</p>
+                                <div class="certificate-score">Score: ${percentage}%</div>
+                                <p>Valid Date: ${result.date}</p>
+                                <p style="font-size: 0.9em; margin-top: 30px;">Valid for 12 months</p>
+                            </div>
+                        </div>
+                        <div style="text-align: center; margin: 20px 0;">
+                            <button class="btn" onclick="window.print()">Print Certificate</button>
+                        </div>
+                    `;
+                }
+
+                document.getElementById('certificateContainer').innerHTML = certHtml;
+            },
+
+            viewResults: function() {
+                const results = storageManager.load('quizResults') || [];
+                if (results.length === 0) {
+                    alert('No quiz results yet. Take a quiz to get started!');
+                    return;
+                }
+
+                document.getElementById('quizModeSelector').style.display = 'none';
+                let resultsHtml = '<div style="background: white; padding: 30px; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.08);">';
+                resultsHtml += '<h4 style="margin-bottom: 20px;">Your Quiz History</h4>';
+                results.forEach((r, idx) => {
+                    resultsHtml += `
+                        <div style="padding: 15px; border-bottom: 1px solid #eee; display: flex; justify-content: space-between; align-items: center;">
+                            <div>
+                                <strong>${r.mode === 'full' ? 'Full Assessment' : 'Practice Mode'}</strong> - ${r.date}
+                            </div>
+                            <div style="font-weight: 700; color: ${r.passed ? '#28a745' : '#dc3545'};">
+                                ${r.percentage}% (${r.correct}/${r.totalQuestions})
+                            </div>
+                        </div>
+                    `;
+                });
+                resultsHtml += '</div>';
+                resultsHtml += '<div style="text-align: center; margin-top: 25px;"><button class="btn" onclick="quizManager.reset()">Take New Quiz</button></div>';
+                document.getElementById('quizContent').innerHTML = resultsHtml;
+                document.getElementById('quizContent').style.display = 'block';
+            },
+
+            reset: function() {
+                this.currentQuestion = 0;
+                this.answers = [];
+                this.currentSession = null;
+                document.getElementById('quizModeSelector').style.display = 'grid';
+                document.getElementById('quizContent').style.display = 'none';
+                document.getElementById('quizResults').style.display = 'none';
+                document.getElementById('questionContainer').innerHTML = '';
+                document.getElementById('certificateContainer').innerHTML = '';
+            }
+        };
+
+        // ============ PHASE 2: PROGRESS TRACKER ============
+        const progressTracker = {
+            data: {
+                phases: [
+                    { name: 'Assessment & Planning', completion: 85, dueDate: '2026-09-15' },
+                    { name: 'Policy Development', completion: 60, dueDate: '2026-10-15' },
+                    { name: 'System Enhancement', completion: 30, dueDate: '2026-11-15' },
+                    { name: 'Training & Communication', completion: 0, dueDate: '2026-12-15' },
+                    { name: 'Testing & Validation', completion: 0, dueDate: '2027-01-15' },
+                    { name: 'Deployment & Monitoring', completion: 0, dueDate: '2027-02-15' }
+                ],
+                training: [
+                    { role: 'Auditors', trained: 15, total: 20 },
+                    { role: 'Operators', trained: 45, total: 60 },
+                    { role: 'Managers', trained: 12, total: 15 },
+                    { role: 'QA Personnel', trained: 8, total: 10 }
+                ],
+                audits: [
+                    { name: 'Baseline', completed: 12, total: 15 },
+                    { name: 'Manufacturing', completed: 8, total: 15 },
+                    { name: 'Quality', completed: 14, total: 15 },
+                    { name: 'LIMS', completed: 11, total: 15 },
+                    { name: 'ERP', completed: 10, total: 15 }
+                ]
+            },
+
+            init: function() {
+                this.renderPhases();
+                this.renderTraining();
+                this.renderAudits();
+            },
+
+            renderPhases: function() {
+                const container = document.getElementById('progressPhases');
+                container.innerHTML = this.data.phases.map((phase, idx) => `
+                    <div class="phase-item">
+                        <div class="phase-header">
+                            <span class="phase-name">Phase ${idx + 1}: ${phase.name}</span>
+                            <span class="phase-percent">${phase.completion}%</span>
+                        </div>
+                        <div class="phase-progress-bar">
+                            <div class="phase-progress-fill" style="width: ${phase.completion}%"></div>
+                        </div>
+                        <div class="phase-meta">
+                            <span>Due: ${phase.dueDate}</span>
+                            <span>Status: ${phase.completion === 100 ? 'Complete' : phase.completion >= 50 ? 'In Progress' : 'Not Started'}</span>
+                        </div>
+                    </div>
+                `).join('');
+            },
+
+            renderTraining: function() {
+                const container = document.getElementById('trainingGauge');
+                container.innerHTML = this.data.training.map(t => {
+                    const percent = Math.round((t.trained / t.total) * 100);
+                    return `
+                        <div class="gauge-card">
+                            <div class="gauge-label">${t.role}</div>
+                            <div class="gauge-number">${percent}%</div>
+                            <div class="gauge-detail">${t.trained} of ${t.total} trained</div>
+                        </div>
+                    `;
+                }).join('');
+            },
+
+            renderAudits: function() {
+                const tbody = document.getElementById('auditStatusTable');
+                tbody.innerHTML = this.data.audits.map(a => {
+                    const percent = Math.round((a.completed / a.total) * 100);
+                    const statusClass = percent === 100 ? 'pass' : percent >= 50 ? 'warning' : 'fail';
+                    return `
+                        <tr>
+                            <td><strong>${a.name}</strong></td>
+                            <td>${a.total}</td>
+                            <td>${a.completed}</td>
+                            <td>${percent}%</td>
+                            <td><span class="status-badge ${statusClass}">${percent === 100 ? 'Complete' : percent >= 50 ? 'In Progress' : 'Not Started'}</span></td>
+                        </tr>
+                    `;
+                }).join('');
+            }
+        };
+
+        // ============ PHASE 2: METRICS ENGINE ============
+        const metricsEngine = {
+            checkCompliance: function() {
+                const scenario = document.getElementById('scenarioSelector').value;
+                const data = testDataScenarios[scenario];
+
+                const lowCompliance = Object.values(data.data).filter(v => v < 80);
+                const alert = document.getElementById('dashboardAlert');
+
+                if (lowCompliance.length > 0) {
+                    alert.classList.add('active');
+                    document.getElementById('alertTitle').textContent = 'Compliance Alert: Areas Below Target';
+                    document.getElementById('alertMessage').textContent = `${lowCompliance.length} principle(s) below 80% compliance. Review manufacturing and consistency metrics.`;
+                } else {
+                    alert.classList.remove('active');
+                }
+            }
+        };
+
+        // ============ INITIALIZATION ============
+        window.addEventListener('load', function() {
+            // Initialize search index
+            searchManager.buildIndex();
+
+            // Initialize progress tracker
+            progressTracker.init();
+
+            // Load initial compliance check
+            metricsEngine.checkCompliance();
+
+            // Add change listener to scenario selector
+            document.getElementById('scenarioSelector').addEventListener('change', function() {
+                metricsEngine.checkCompliance();
+            });
+
+            // Close modal on escape key
+            document.addEventListener('keydown', function(e) {
+                if (e.key === 'Escape') {
+                    exportManager.closeModal();
+                }
+            });
+
+            // Close modal when clicking outside
+            document.getElementById('exportModal').addEventListener('click', function(e) {
+                if (e.target === this) {
+                    exportManager.closeModal();
+                }
+            });
+        });
+    </script>
+</body>
+</html>

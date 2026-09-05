@@ -1,0 +1,167 @@
+{
+  "project_name": "ALCOA+ Data Integrity Framework",
+  "project_description": "Interactive web-based tool for implementing and monitoring ALCOA+ principles in pharmaceutical operations",
+  "version": "1.0.0",
+  "phase": "2",
+  "status": "In Development",
+
+  "permissions": {
+    "bash": {
+      "description": "Allow bash commands for development and testing",
+      "allowed": true
+    },
+    "file_operations": {
+      "description": "Allow file read/write operations",
+      "allowed": true
+    },
+    "web_access": {
+      "description": "Allow web search and fetch",
+      "allowed": false
+    }
+  },
+
+  "environment": {
+    "python_server_port": 8000,
+    "root_directory": "/home/labuser/Day 1",
+    "main_file": "alcoa-plus-tool.html",
+    "documentation_root": ".",
+    "test_data_format": "json"
+  },
+
+  "code_style": {
+    "language": "html5/css3/javascript",
+    "indentation": "2 spaces",
+    "line_length": 100,
+    "naming_convention": "camelCase for JavaScript, kebab-case for CSS classes",
+    "quotes": "single for HTML attributes, double for JavaScript strings"
+  },
+
+  "testing": {
+    "browser_compatibility": ["chrome", "firefox", "safari", "edge"],
+    "responsive_breakpoints": [480, 768, 1024],
+    "accessibility_standard": "WCAG 2.1 Level AA",
+    "performance_target": "<2s load time"
+  },
+
+  "development_guidelines": {
+    "no_external_dependencies": true,
+    "single_file_approach": true,
+    "preserve_functionality": true,
+    "maintain_design_system": true,
+    "mobile_first_approach": true,
+    "accessibility_first": true
+  },
+
+  "git_configuration": {
+    "commit_template": "commit-template.txt",
+    "auto_format": false,
+    "lint_before_commit": false,
+    "require_tests": false
+  },
+
+  "documentation": {
+    "main_doc": "CLAUDE.md",
+    "design_system": "DESIGN_SYSTEM.md",
+    "improvements": "UI_UX_IMPROVEMENTS.md",
+    "phases": "IMPLEMENTATION_PHASES.md",
+    "agent_work": "AGENT_WORK.md"
+  },
+
+  "phases": {
+    "phase_1": {
+      "name": "UI/UX Redesign",
+      "status": "COMPLETED",
+      "date": "2026-08-29",
+      "deliverables": [
+        "Modern visual design system",
+        "Color-coded principle cards",
+        "Enhanced interactive components",
+        "Mobile responsive design",
+        "WCAG AA accessibility"
+      ]
+    },
+    "phase_2": {
+      "name": "Advanced Features & Interactivity",
+      "status": "IN_PROGRESS",
+      "target_start": "2026-09-05",
+      "target_end": "2026-09-25",
+      "features": [
+        "Data export (PDF, Excel)",
+        "Advanced search & filter",
+        "Assessment quiz system",
+        "Progress tracking dashboard",
+        "Real-time compliance metrics"
+      ]
+    },
+    "phase_3": {
+      "name": "Integration & Customization",
+      "status": "SCHEDULED",
+      "target_start": "2026-09-26",
+      "target_end": "2026-10-23",
+      "features": [
+        "API integration framework",
+        "Multi-language support",
+        "Custom branding system",
+        "User account system",
+        "Role-based access control"
+      ]
+    },
+    "phase_4": {
+      "name": "Mobile App & Advanced Analytics",
+      "status": "SCHEDULED",
+      "target_start": "2026-10-24",
+      "target_end": "2026-12-04",
+      "features": [
+        "Native mobile apps",
+        "Advanced analytics dashboard",
+        "Predictive compliance scoring",
+        "Automated recommendations",
+        "Performance optimization"
+      ]
+    }
+  },
+
+  "tools": {
+    "local_server": {
+      "command": "python3 -m http.server 8000",
+      "port": 8000,
+      "url": "http://localhost:8000/alcoa-plus-tool.html"
+    },
+    "text_editor": "any",
+    "browser_testing": ["chrome", "firefox", "safari"],
+    "responsive_testing": true,
+    "accessibility_testing": true
+  },
+
+  "build_artifacts": {
+    "main_application": "alcoa-plus-tool.html",
+    "documentation": [
+      "CLAUDE.md",
+      "DESIGN_SYSTEM.md",
+      "UI_UX_IMPROVEMENTS.md",
+      "IMPLEMENTATION_PHASES.md",
+      "AGENT_WORK.md"
+    ]
+  },
+
+  "deployment": {
+    "type": "static_html",
+    "no_server_side_processing": true,
+    "works_offline": true,
+    "cors_compliant": true,
+    "target_browsers": "IE 11+, Chrome 90+, Firefox 88+, Safari 14+, Edge 90+"
+  },
+
+  "team": {
+    "project_owner": "Eli Lilly Quality Assurance",
+    "current_phase_lead": "Full-Stack Development Agent",
+    "designers": ["UI/UX Design Agent (Phase 1)"],
+    "developers": ["Full-Stack Development Agent (Phase 2)"]
+  },
+
+  "contact": {
+    "department": "Eli Lilly Operations Excellence",
+    "email": "qa-team@eli-lilly.com",
+    "feedback": "Report issues and feedback in project documentation"
+  }
+}

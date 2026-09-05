@@ -1,0 +1,65 @@
+{
+  "hooks": {
+    "SessionStart": [
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "echo '🚀 Eli Lilly ALCOA+ QA System session started' && echo 'Backend: http://localhost:8000' && echo 'Frontend: http://localhost:8080' && echo 'API Docs: http://localhost:8000/docs'",
+            "statusMessage": "Initializing ALCOA+ QA System"
+          }
+        ]
+      }
+    ],
+    "PreToolUse": [
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "echo '[Pre-check] Validating environment...' && python -c 'import fastapi; import sqlalchemy; print(\"✓ Dependencies OK\")' 2>/dev/null || echo '⚠ Missing dependencies'",
+            "statusMessage": "Validating Python environment",
+            "timeout": 5
+          }
+        ]
+      }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "rm -rf ./dist 2>/dev/null; find /tmp -name '*claude*' -type f -mtime +7 -delete 2>/dev/null || true",
+            "statusMessage": "Cleaning up build artifacts and temp logs",
+            "timeout": 10
+          }
+        ]
+      },
+      {
+        "matcher": "Write|Edit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "find . -name '*.py' -type f -newer /tmp/.last_edit 2>/dev/null | head -1 | xargs -I {} echo 'Modified: {}' || true",
+            "statusMessage": "Logging file modifications",
+            "timeout": 5
+          }
+        ]
+      }
+    ],
+    "Stop": [
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "rm -rf ./dist 2>/dev/null; rm -f /tmp/backend.log /tmp/frontend.log /tmp/.last_edit 2>/dev/null || true",
+            "statusMessage": "Cleaning up dist directory and temp logs"
+          }
+        ]
+      }
+    ]
+  }
+}

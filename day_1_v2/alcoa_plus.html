@@ -1,0 +1,380 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ALCOA Plus - Data Integrity Framework</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+            overflow: hidden;
+        }
+
+        header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 60px 40px;
+            text-align: center;
+        }
+
+        header h1 {
+            font-size: 3em;
+            margin-bottom: 10px;
+        }
+
+        header p {
+            font-size: 1.2em;
+            opacity: 0.9;
+        }
+
+        .content {
+            padding: 60px 40px;
+        }
+
+        .intro {
+            background: #f8f9fa;
+            padding: 30px;
+            border-radius: 8px;
+            margin-bottom: 40px;
+            border-left: 5px solid #667eea;
+        }
+
+        .intro h2 {
+            color: #667eea;
+            margin-bottom: 15px;
+        }
+
+        .principles-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 25px;
+            margin: 40px 0;
+        }
+
+        .principle-card {
+            background: white;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            padding: 30px;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+        }
+
+        .principle-card:hover {
+            border-color: #667eea;
+            box-shadow: 0 8px 20px rgba(102, 126, 234, 0.2);
+            transform: translateY(-5px);
+        }
+
+        .principle-card h3 {
+            color: #667eea;
+            font-size: 1.5em;
+            margin-bottom: 10px;
+        }
+
+        .principle-card .label {
+            display: inline-block;
+            background: #667eea;
+            color: white;
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 0.85em;
+            font-weight: bold;
+            margin-bottom: 15px;
+        }
+
+        .principle-card.plus .label {
+            background: #764ba2;
+        }
+
+        .principle-card p {
+            color: #666;
+            line-height: 1.8;
+        }
+
+        .section {
+            margin: 50px 0;
+        }
+
+        .section h2 {
+            color: #667eea;
+            font-size: 2em;
+            margin-bottom: 25px;
+            padding-bottom: 10px;
+            border-bottom: 3px solid #667eea;
+        }
+
+        .benefits-list {
+            list-style: none;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 15px;
+            margin: 20px 0;
+        }
+
+        .benefits-list li {
+            padding: 15px 20px;
+            background: #f0f4ff;
+            border-left: 4px solid #667eea;
+            border-radius: 4px;
+        }
+
+        .benefits-list li:before {
+            content: "✓ ";
+            color: #667eea;
+            font-weight: bold;
+            margin-right: 10px;
+        }
+
+        .comparison-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 25px 0;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        .comparison-table th {
+            background: #667eea;
+            color: white;
+            padding: 15px;
+            text-align: left;
+            font-weight: 600;
+        }
+
+        .comparison-table td {
+            padding: 15px;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        .comparison-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        .comparison-table tr:nth-child(even) {
+            background: #f8f9fa;
+        }
+
+        .use-cases {
+            background: #f0f4ff;
+            padding: 30px;
+            border-radius: 8px;
+            margin: 30px 0;
+        }
+
+        .use-cases h3 {
+            color: #667eea;
+            margin-bottom: 20px;
+        }
+
+        .use-cases ul {
+            list-style-position: inside;
+            line-height: 2;
+        }
+
+        .use-cases li {
+            margin-left: 20px;
+        }
+
+        footer {
+            background: #f8f9fa;
+            padding: 30px 40px;
+            text-align: center;
+            color: #666;
+            border-top: 1px solid #e0e0e0;
+        }
+
+        @media (max-width: 768px) {
+            header h1 {
+                font-size: 2em;
+            }
+
+            .content {
+                padding: 30px 20px;
+            }
+
+            .principles-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>ALCOA Plus</h1>
+            <p>Data Integrity Framework for Regulated Industries</p>
+        </header>
+
+        <div class="content">
+            <div class="intro">
+                <h2>What is ALCOA Plus?</h2>
+                <p>ALCOA Plus is an enhanced framework that defines the essential characteristics of reliable, compliant data and records in regulated industries. It builds upon the original ALCOA principles by adding two critical components: Compliance and Auditability. This framework is essential for organizations operating under regulatory requirements such as FDA 21 CFR Part 11, ICH guidelines, and other international standards.</p>
+            </div>
+
+            <div class="section">
+                <h2>The Seven Principles</h2>
+                <div class="principles-grid">
+                    <div class="principle-card">
+                        <span class="label">Original ALCOA</span>
+                        <h3>Attributable</h3>
+                        <p>Every record must clearly identify who performed an action, when it was performed, and why. Records should include user identification, timestamp, and purpose of the action.</p>
+                    </div>
+
+                    <div class="principle-card">
+                        <span class="label">Original ALCOA</span>
+                        <h3>Legible</h3>
+                        <p>All records must be clear, readable, and understandable. Data should be presented in a format that can be easily read and understood by intended users without ambiguity.</p>
+                    </div>
+
+                    <div class="principle-card">
+                        <span class="label">Original ALCOA</span>
+                        <h3>Contemporaneous</h3>
+                        <p>Data must be recorded at the time an event occurs, not retroactively. Records should reflect real-time activities and decisions made during the actual process.</p>
+                    </div>
+
+                    <div class="principle-card">
+                        <span class="label">Original ALCOA</span>
+                        <h3>Original</h3>
+                        <p>Records should be maintained in their original form. Any copies must be verifiable as true copies, and changes must be tracked without destroying the original data.</p>
+                    </div>
+
+                    <div class="principle-card">
+                        <span class="label">Original ALCOA</span>
+                        <h3>Accurate</h3>
+                        <p>All data must be correct, precise, and complete. Records should reflect factual information and include all relevant details necessary for decision-making.</p>
+                    </div>
+
+                    <div class="principle-card plus">
+                        <span class="label">ALCOA Plus Extension</span>
+                        <h3>Compliant</h3>
+                        <p>Records must conform to all applicable regulatory requirements and internal company policies. Systems and processes should be designed to meet regulatory standards from inception.</p>
+                    </div>
+
+                    <div class="principle-card plus">
+                        <span class="label">ALCOA Plus Extension</span>
+                        <h3>Auditable</h3>
+                        <p>Records must support inspection and audit procedures. Complete audit trails should be maintained to track all changes, access, and modifications to data.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="section">
+                <h2>ALCOA vs ALCOA Plus Comparison</h2>
+                <table class="comparison-table">
+                    <thead>
+                        <tr>
+                            <th>Aspect</th>
+                            <th>ALCOA</th>
+                            <th>ALCOA Plus</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>Principles</strong></td>
+                            <td>5 core principles</td>
+                            <td>7 principles (5 original + 2 new)</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Regulatory Focus</strong></td>
+                            <td>General data integrity</td>
+                            <td>Comprehensive compliance framework</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Audit Trail</strong></td>
+                            <td>Tracked</td>
+                            <td>Comprehensive and auditable</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Compliance</strong></td>
+                            <td>Implied</td>
+                            <td>Explicit requirement</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Scope</strong></td>
+                            <td>Data records</td>
+                            <td>Data records + systems + processes</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="section">
+                <h2>Key Benefits</h2>
+                <ul class="benefits-list">
+                    <li>Ensures regulatory compliance and reduces audit risk</li>
+                    <li>Enhances data quality and reliability</li>
+                    <li>Improves traceability and accountability</li>
+                    <li>Supports decision-making with trustworthy data</li>
+                    <li>Facilitates inspections and regulatory submissions</li>
+                    <li>Minimizes operational and legal risks</li>
+                    <li>Builds stakeholder confidence and credibility</li>
+                    <li>Enables quick root cause analysis and investigation</li>
+                </ul>
+            </div>
+
+            <div class="use-cases">
+                <h3>Industries & Applications</h3>
+                <ul>
+                    <li><strong>Pharmaceutical:</strong> Drug development, manufacturing, quality control, and clinical trials</li>
+                    <li><strong>Medical Devices:</strong> Design, validation, manufacturing, and post-market surveillance</li>
+                    <li><strong>Biotechnology:</strong> Research, testing, and validation processes</li>
+                    <li><strong>Healthcare:</strong> Electronic health records (EHR) and patient data management</li>
+                    <li><strong>Food & Beverage:</strong> Safety records and compliance documentation</li>
+                    <li><strong>Manufacturing:</strong> Quality assurance and production records</li>
+                    <li><strong>Financial Services:</strong> Transaction records and audit compliance</li>
+                </ul>
+            </div>
+
+            <div class="section">
+                <h2>Implementation Best Practices</h2>
+                <ul class="benefits-list">
+                    <li>Implement validated Electronic Data Management (EDM) systems</li>
+                    <li>Define clear roles, responsibilities, and access controls</li>
+                    <li>Establish comprehensive audit trail capabilities</li>
+                    <li>Document and validate all processes and procedures</li>
+                    <li>Provide regular training to all personnel</li>
+                    <li>Conduct periodic audits and assessments</li>
+                    <li>Maintain detailed records of all data lifecycle events</li>
+                    <li>Establish change management procedures</li>
+                </ul>
+            </div>
+
+            <div class="section">
+                <h2>Regulatory References</h2>
+                <ul class="benefits-list">
+                    <li>FDA 21 CFR Part 11 - Electronic Records; Electronic Signatures</li>
+                    <li>ICH Q14 - Analytical Procedure Development</li>
+                    <li>EU Annex 11 - Computerised Systems</li>
+                    <li>WHO Guidelines on Data Integrity</li>
+                    <li>GAMP 5 - Compliant IT Systems Implementation</li>
+                </ul>
+            </div>
+        </div>
+
+        <footer>
+            <p>&copy; 2026 ALCOA Plus Framework. This page provides educational information about data integrity standards in regulated industries.</p>
+        </footer>
+    </div>
+</body>
+</html>
