@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pharma Shipment Risk Analyzer</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <div class="header-content">
+                <div class="logo">📦</div>
+                <div class="title-section">
+                    <h1>Pharma Shipment Risk Analyzer</h1>
+                    <p class="subtitle">AI-Powered Supply Chain Intelligence</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="main-content">
+            <!-- Upload Section -->
+            <section class="upload-section">
+                <div class="upload-card">
+                    <h2>📤 Upload Shipment Data</h2>
+                    <div class="upload-area" id="uploadArea">
+                        <div class="upload-icon">📁</div>
+                        <p>Drag and drop your Excel file here</p>
+                        <p class="small-text">or</p>
+                        <input type="file" id="fileInput" accept=".xlsx,.xls,.csv" hidden>
+                        <button class="btn-primary" onclick="document.getElementById('fileInput').click()">
+                            Choose File
+                        </button>
+                    </div>
+                    <div id="uploadStatus" class="upload-status" style="display: none;"></div>
+                </div>
+            </section>
+
+            <!-- Dashboard Section -->
+            <section id="dashboardSection" class="dashboard-section" style="display: none;">
+                <!-- Metrics Cards -->
+                <div class="metrics-grid">
+                    <div class="metric-card">
+                        <div class="metric-icon">📦</div>
+                        <div class="metric-content">
+                            <div class="metric-label">Total Shipments</div>
+                            <div class="metric-value" id="totalShipments">0</div>
+                        </div>
+                    </div>
+
+                    <div class="metric-card alert">
+                        <div class="metric-icon">🚨</div>
+                        <div class="metric-content">
+                            <div class="metric-label">High-Risk Shipments</div>
+                            <div class="metric-value" id="highRiskCount">0</div>
+                            <div class="metric-percent" id="highRiskPercent">0%</div>
+                        </div>
+                    </div>
+
+                    <div class="metric-card warning">
+                        <div class="metric-icon">🌡️</div>
+                        <div class="metric-content">
+                            <div class="metric-label">Temperature Excursions</div>
+                            <div class="metric-value" id="tempExcursions">0</div>
+                        </div>
+                    </div>
+
+                    <div class="metric-card info">
+                        <div class="metric-icon">📊</div>
+                        <div class="metric-content">
+                            <div class="metric-label">Average Risk Score</div>
+                            <div class="metric-value" id="avgRiskScore">0</div>
+                            <div class="metric-unit">/100</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Charts and Top 5 -->
+                <div class="content-grid">
+                    <!-- Risk Distribution Chart -->
+                    <div class="chart-card">
+                        <h3>📈 Risk Distribution</h3>
+                        <canvas id="riskChart"></canvas>
+                    </div>
+
+                    <!-- Top 5 High-Risk Shipments -->
+                    <div class="top-risks-card">
+                        <h3>🔝 Top 5 Highest-Risk Shipments</h3>
+                        <div class="top-risks-list" id="topRisksList">
+                            <!-- Populated by JavaScript -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- AI Recommendations -->
+                <div class="recommendations-section">
+                    <h3>💡 AI-Powered Recommendations</h3>
+                    <div class="recommendation-box" id="recommendationBox">
+                        <div class="loading">⏳ Generating recommendations...</div>
+                    </div>
+                </div>
+
+                <!-- Export Button -->
+                <div class="action-buttons">
+                    <button class="btn-secondary" onclick="exportData()">📥 Export Report</button>
+                    <button class="btn-secondary" onclick="uploadNew()">📤 Upload New File</button>
+                </div>
+            </section>
+
+            <!-- Error Section -->
+            <section id="errorSection" class="error-section" style="display: none;">
+                <div class="error-card">
+                    <div class="error-icon">⚠️</div>
+                    <h3>Upload Error</h3>
+                    <p id="errorMessage"></p>
+                    <button class="btn-primary" onclick="uploadNew()">Try Again</button>
+                </div>
+            </section>
+        </div>
+
+        <!-- Footer -->
+        <div class="footer">
+            <p>Pharma Shipment Risk Analyzer v1.0.0 | Powered by Claude AI</p>
+            <p class="compliance">FDA 21 CFR Part 11 Compliant | GDPR Ready</p>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>

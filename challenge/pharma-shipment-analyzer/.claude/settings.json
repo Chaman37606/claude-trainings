@@ -1,0 +1,36 @@
+{
+  "modelContextProtocol": {
+    "enabled": true,
+    "name": "Pharma Risk Analyzer MCP"
+  },
+  "hooks": {
+    "PostToolUse": [
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "if grep -q 'high_risk' /tmp/pharma_analysis.json 2>/dev/null; then echo '{\"systemMessage\": \"🚨 HIGH-RISK SHIPMENTS DETECTED - Immediate review required\"}'; fi"
+          }
+        ]
+      }
+    ]
+  },
+  "permissions": {
+    "allow": [
+      "Bash(python backend/main.py)",
+      "Bash(cd backend && python -m pip install)",
+      "Read(backend/)",
+      "Read(frontend/)",
+      "Edit(backend/)",
+      "Edit(frontend/)"
+    ],
+    "ask": [
+      "Bash(rm -rf *)"
+    ]
+  },
+  "env": {
+    "API_PORT": "8000",
+    "UI_PORT": "3000"
+  }
+}
