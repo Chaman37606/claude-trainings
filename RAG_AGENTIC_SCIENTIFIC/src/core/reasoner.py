@@ -93,7 +93,6 @@ Remember: Every claim must be cited. If you cannot adequately answer from these 
             response = self.client.messages.create(
                 model=self.model,
                 max_tokens=2000,
-                temperature=0,
                 system=system_prompt,
                 messages=[{"role": "user", "content": user_prompt}],
             )
