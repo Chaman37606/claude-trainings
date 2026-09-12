@@ -1,0 +1,20 @@
+{
+  "permissions": {
+    "allow": [
+      "Read(src/)",
+      "Read(data/)",
+      "Read(tests/)",
+      "Bash(python -m src.api.cli)",
+      "Bash(python -m pytest)"
+    ],
+    "ask": [
+      "Write(data/sources_approved.json)",
+      "Edit(.claude/settings.json)"
+    ]
+  },
+  "env": {
+    "APPROVED_SOURCES_FILE": "data/sources_approved.json",
+    "DATABASE_URL": "sqlite:///./audit.db",
+    "REVIEWER_ID": "dr_default@research.org"
+  }
+}

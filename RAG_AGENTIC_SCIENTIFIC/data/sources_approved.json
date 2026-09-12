@@ -1,0 +1,134 @@
+{
+  "sources": [
+    {
+      "id": "source_001",
+      "name": "Nature Medicine 2024",
+      "type": "journal",
+      "domain": "pharmacology",
+      "approved": true,
+      "content": "A randomized controlled trial of 500 patients with condition Y found that drug X reduced symptoms by 40% compared to placebo (95% CI: 32-48%, p<0.001). The treatment was well-tolerated with minimal adverse events reported. Most common side effects were mild headache (8%) and nausea (6%), which resolved without intervention.",
+      "metadata": {
+        "authors": ["Smith et al."],
+        "date": "2024-03-15",
+        "doi": "10.1038/nm.2024.001"
+      }
+    },
+    {
+      "id": "source_002",
+      "name": "FDA Clinical Review Summary",
+      "type": "regulatory",
+      "domain": "pharmacology",
+      "approved": true,
+      "content": "FDA approved drug X for condition Y on June 2023 based on Phase III clinical trial data. The approval was granted under standard review as the drug demonstrated substantial clinical benefit for patients with moderate to severe disease. The recommended dose is 50mg twice daily with food.",
+      "metadata": {
+        "agency": "FDA",
+        "date": "2023-06-20",
+        "approval_type": "standard"
+      }
+    },
+    {
+      "id": "source_003",
+      "name": "Journal of Clinical Research 2023",
+      "type": "journal",
+      "domain": "pharmacology",
+      "approved": true,
+      "content": "Mechanistic studies show that drug X works by inhibiting protein kinase C, which leads to reduced inflammatory cytokine production. The pharmacokinetics indicate peak plasma concentration at 2 hours with a half-life of 12 hours. Steady state is achieved within 5 days of twice-daily dosing.",
+      "metadata": {
+        "authors": ["Johnson et al."],
+        "date": "2023-11-10",
+        "doi": "10.1016/jcr.2023.001"
+      }
+    },
+    {
+      "id": "source_004",
+      "name": "WHO Expert Committee Report",
+      "type": "regulatory",
+      "domain": "pharmacology",
+      "approved": true,
+      "content": "The WHO Expert Committee reviewed drug X and recommends its inclusion in the WHO Essential Medicines List for treatment of condition Y in resource-limited settings. Cost-effectiveness analysis shows drug X provides better health outcomes per dollar spent compared to existing standard therapy.",
+      "metadata": {
+        "organization": "WHO",
+        "date": "2024-02-01",
+        "report_number": "WHO/EML/2024/01"
+      }
+    },
+    {
+      "id": "source_005",
+      "name": "Adverse Event Surveillance Database 2024",
+      "type": "database",
+      "domain": "pharmacology",
+      "approved": true,
+      "content": "Post-marketing surveillance of 50,000 patients on drug X identified the following adverse events: headache (5-8%), nausea (3-6%), dizziness (2-4%), and rash (1-2%). No cases of hepatotoxicity or cardiac arrhythmias were reported. One case of anaphylaxis was reported in a patient with known drug allergies.",
+      "metadata": {
+        "authority": "FDA MedWatch",
+        "date": "2024-09-01",
+        "patients_monitored": 50000
+      }
+    },
+    {
+      "id": "source_006",
+      "name": "Internal Research Report - Phase IIb Trial",
+      "type": "report",
+      "domain": "pharmacology",
+      "approved": true,
+      "content": "Phase IIb dose-escalation study in 120 patients showed dose-dependent efficacy. The 50mg twice-daily dose selected for Phase III showed optimal balance between efficacy and tolerability. Doses above 100mg daily showed increased adverse events without proportional efficacy gains.",
+      "metadata": {
+        "company": "Research Pharma Inc.",
+        "date": "2022-06-30",
+        "trial_id": "TRIAL-2022-050"
+      }
+    },
+    {
+      "id": "source_007",
+      "name": "Cochrane Review Database 2024",
+      "type": "database",
+      "domain": "pharmacology",
+      "approved": true,
+      "content": "Cochrane systematic review of all randomized trials of drug X (6 studies, n=1,200) found consistent efficacy across trials with NNT of 3.5 (95% CI: 2.8-4.6). Heterogeneity was low (I²=15%), indicating robust evidence. The review concluded that drug X is an effective treatment option for condition Y.",
+      "metadata": {
+        "review_group": "Cochrane Musculoskeletal",
+        "date": "2024-05-15",
+        "studies_included": 6
+      }
+    },
+    {
+      "id": "source_008",
+      "name": "EMA Assessment Report",
+      "type": "regulatory",
+      "domain": "pharmacology",
+      "approved": true,
+      "content": "European Medicines Agency approved drug X for condition Y in August 2023. The EMA noted the quality of the clinical development program and concluded that the benefit-risk profile is favorable. Recommended starting dose is 50mg once daily, titrating to twice daily based on response.",
+      "metadata": {
+        "agency": "EMA",
+        "date": "2023-08-15",
+        "procedure": "centralized"
+      }
+    },
+    {
+      "id": "source_009",
+      "name": "Long-term Follow-up Study",
+      "type": "journal",
+      "domain": "pharmacology",
+      "approved": true,
+      "content": "Extended follow-up of 200 patients treated with drug X for 2 years showed sustained efficacy with no loss of effect over time. No tolerance development was observed. Quality of life improvements persisted throughout the study period with QALY gain of 1.2 per patient.",
+      "metadata": {
+        "authors": ["Chen et al."],
+        "date": "2024-01-20",
+        "follow_up_duration": "24 months"
+      }
+    },
+    {
+      "id": "source_010",
+      "name": "Comparative Effectiveness Study",
+      "type": "journal",
+      "domain": "pharmacology",
+      "approved": true,
+      "content": "Head-to-head trial comparing drug X with existing standard therapy in 300 patients found drug X superior in primary endpoint (40% vs 20% response rate, NNT=5). Drug X showed better tolerability profile with fewer treatment discontinuations due to adverse events (8% vs 15%).",
+      "metadata": {
+        "authors": ["Williams et al."],
+        "date": "2024-04-10",
+        "doi": "10.1016/lancet.2024.001"
+      }
+    }
+  ]
+}
