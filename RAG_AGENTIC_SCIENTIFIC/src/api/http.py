@@ -118,7 +118,6 @@ def submit_query(
         reasoner = LLMReasoner(
             api_key=api_key,
             use_stub=use_stub,
-            provider="groq"
         )
         response, requires_review = reasoner.reason(query, sources, audit_id)
 

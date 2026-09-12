@@ -1,7 +1,7 @@
 import json
 import re
 from typing import List, Tuple
-from openai import OpenAI
+from anthropic import Anthropic
 from src.models import ResearchQuery, ResearchResponse, Citation, ConfidenceLevel, Source
 
 
@@ -9,22 +9,14 @@ class LLMReasoner:
     def __init__(
         self,
         api_key: str = None,
-        model: str = "openai/gpt-oss-120b",
+        model: str = "claude-opus-4-1-20250805",
         use_stub: bool = False,
-        provider: str = "groq"
     ):
         self.use_stub = use_stub
         self.model = model
-        self.provider = provider
 
         if not use_stub and api_key:
-            if provider == "groq":
-                self.client = OpenAI(
-                    api_key=api_key,
-                    base_url="https://api.groq.com/openai/v1"
-                )
-            else:
-                self.client = OpenAI(api_key=api_key)
+            self.client = Anthropic(api_key=api_key)
         else:
             self.client = None
 
@@ -98,17 +90,15 @@ APPROVED SOURCES:
 Remember: Every claim must be cited. If you cannot adequately answer from these sources, say so."""
 
         try:
-            response = self.client.chat.completions.create(
+            response = self.client.messages.create(
                 model=self.model,
                 max_tokens=2000,
                 temperature=0,
-                messages=[
-                    {"role": "system", "content": system_prompt},
-                    {"role": "user", "content": user_prompt}
-                ],
+                system=system_prompt,
+                messages=[{"role": "user", "content": user_prompt}],
             )
 
-            response_text = response.choices[0].message.content
+            response_text = response.content[0].text
 
             # Parse JSON response
             try:
