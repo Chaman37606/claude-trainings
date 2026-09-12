@@ -1,0 +1,12 @@
+{
+  "mcpServers": {
+    "travelops": {
+      "type": "stdio",
+      "command": "/home/labuser/claude_training/helios-mcp-server/.venv/bin/python",
+      "args": [
+        "/home/labuser/claude_training/helios-mcp-server/travelops_mcp_server.py"
+      ],
+      "env": {}
+    }
+  }
+}

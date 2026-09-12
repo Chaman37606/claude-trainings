@@ -1,0 +1,18 @@
+{
+  "permissions": {
+    "allow": [
+      "bash:run",
+      "bash:background",
+      "read:*",
+      "write:*.py",
+      "edit:*.py"
+    ]
+  },
+  "hooks": {
+    "before_submit": "echo 'Testing MCP server before submission...' && source .venv/bin/activate && python -m py_compile travelops_mcp_server.py"
+  },
+  "aliases": {
+    "test": "claude /mcp",
+    "server": "source .venv/bin/activate && python travelops_mcp_server.py"
+  }
+}
