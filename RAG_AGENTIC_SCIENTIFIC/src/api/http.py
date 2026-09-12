@@ -39,8 +39,8 @@ if static_dir.exists():
 
 @app.get("/")
 def root():
-    """Redirect to UI."""
-    return JSONResponse({"redirect": "/ui"}, status_code=301)
+    """Serve the web UI."""
+    return FileResponse(Path(__file__).parent / "static" / "index.html")
 
 
 @app.get("/ui")
