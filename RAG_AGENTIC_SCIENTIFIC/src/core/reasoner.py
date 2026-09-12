@@ -15,7 +15,9 @@ class LLMReasoner:
         self.use_stub = use_stub
         self.model = model
 
-        if not use_stub and api_key:
+        if not use_stub:
+            if not api_key:
+                raise ValueError("API key is required when not using stub mode")
             self.client = Anthropic(api_key=api_key)
         else:
             self.client = None

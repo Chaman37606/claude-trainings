@@ -114,11 +114,27 @@ def submit_query(
 
         auditor.log_retrieval(audit_id, query_id, sources, user_id)
 
+        # Determine if using stub mode
+        # Use stub mode if explicitly requested, or if API key not provided and not explicitly disabled
+        should_use_stub = use_stub or (api_key is None)
+
         # Generate answer
-        reasoner = LLMReasoner(
-            api_key=api_key,
-            use_stub=use_stub,
-        )
+        try:
+            reasoner = LLMReasoner(
+                api_key=api_key if not should_use_stub else None,
+                use_stub=should_use_stub,
+            )
+        except ValueError as e:
+            return {
+                "audit_id": audit_id,
+                "error": str(e),
+                "status": "error",
+                "confidence": "low",
+                "citations": [],
+                "gaps": ["API key required or use demo mode"],
+                "reviewer_required": True,
+            }
+
         response, requires_review = reasoner.reason(query, sources, audit_id)
 
         # Validate citations
