@@ -2,9 +2,11 @@
 
 from fastapi import FastAPI, HTTPException, BackgroundTasks
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import JSONResponse
+from fastapi.responses import JSONResponse, FileResponse
+from fastapi.staticfiles import StaticFiles
 import json
 from datetime import datetime
+from pathlib import Path
 
 from src.models import ResearchQuery, ConfidenceLevel
 from src.core import ApprovedRetriever, CitationValidator, LLMReasoner, AuditTrail
@@ -29,21 +31,22 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+# Serve static files
+static_dir = Path(__file__).parent / "static"
+if static_dir.exists():
+    app.mount("/static", StaticFiles(directory=str(static_dir)), name="static")
+
 
 @app.get("/")
 def root():
-    """API documentation."""
-    return {
-        "name": "RAG Agentic Scientific Research System",
-        "version": "1.0.0",
-        "endpoints": {
-            "POST /api/query": "Submit research query",
-            "GET /api/response/{audit_id}": "Get response by audit ID",
-            "POST /api/review/{audit_id}": "Review and approve/reject response",
-            "GET /api/audit/{audit_id}": "Export complete audit trail",
-            "GET /api/sources": "List approved sources",
-        },
-    }
+    """Redirect to UI."""
+    return JSONResponse({"redirect": "/ui"}, status_code=301)
+
+
+@app.get("/ui")
+def ui():
+    """Serve the web UI."""
+    return FileResponse(Path(__file__).parent / "static" / "index.html")
 
 
 @app.get("/api/sources")
@@ -76,6 +79,8 @@ def submit_query(
     domain: str,
     user_id: str,
     context: str = "",
+    api_key: str = None,
+    use_stub: bool = True,
 ):
     """Submit research query and get evidence-grounded answer."""
     db = SessionLocal()
@@ -110,7 +115,11 @@ def submit_query(
         auditor.log_retrieval(audit_id, query_id, sources, user_id)
 
         # Generate answer
-        reasoner = LLMReasoner(use_stub=True)
+        reasoner = LLMReasoner(
+            api_key=api_key,
+            use_stub=use_stub,
+            provider="groq"
+        )
         response, requires_review = reasoner.reason(query, sources, audit_id)
 
         # Validate citations
