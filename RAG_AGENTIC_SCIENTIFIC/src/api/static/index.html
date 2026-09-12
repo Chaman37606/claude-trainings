@@ -4,443 +4,519 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>RAG Scientific Research System</title>
-    <script src="https://cdn.jsdelivr.net/npm/vue@3/dist/vue.global.js"></script>
-    <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        [v-cloak] { display: none; }
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
-        .gradient-bg { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); }
-        .fade-enter-active { transition: opacity 0.3s; }
-        .fade-enter-from { opacity: 0; }
-        .result-box {
-            background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%);
-            border: 1px solid rgba(102, 126, 234, 0.3);
-            border-radius: 8px;
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        .header {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            margin-bottom: 30px;
+        }
+
+        .header h1 {
+            color: #333;
+            margin-bottom: 10px;
+            font-size: 28px;
+        }
+
+        .header p {
+            color: #666;
+            font-size: 16px;
+        }
+
+        .card {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+        }
+
+        .card h2 {
+            color: #333;
+            margin-bottom: 20px;
+            font-size: 22px;
+            border-bottom: 2px solid #667eea;
+            padding-bottom: 10px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            color: #333;
+            font-weight: 500;
+            margin-bottom: 8px;
+        }
+
+        .form-group input,
+        .form-group textarea,
+        .form-group select {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-family: inherit;
+            font-size: 14px;
+            transition: border-color 0.3s;
+        }
+
+        .form-group input:focus,
+        .form-group textarea:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .form-group textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        .button-group {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        button {
+            padding: 12px 20px;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .btn-primary {
+            background: #667eea;
+            color: white;
+            grid-column: 1 / -1;
+        }
+
+        .btn-primary:hover:not(:disabled) {
+            background: #5568d3;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-primary:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+        }
+
+        .btn-secondary {
+            background: #6c757d;
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background: #5a6268;
+        }
+
+        .success {
+            background: #d4edda;
+            color: #155724;
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+            border: 1px solid #c3e6cb;
+        }
+
+        .error {
+            background: #f8d7da;
+            color: #721c24;
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+            border: 1px solid #f5c6cb;
+        }
+
+        .info {
+            background: #d1ecf1;
+            color: #0c5460;
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+            border: 1px solid #bee5eb;
+        }
+
+        .response-box {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 5px;
+            border-left: 4px solid #667eea;
+            margin-top: 20px;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            font-family: 'Courier New', monospace;
+            font-size: 13px;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        .citation {
+            background: #f8f9fa;
+            padding: 15px;
+            margin: 10px 0;
+            border-left: 3px solid #667eea;
+            border-radius: 3px;
+        }
+
+        .citation-source {
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 5px;
+        }
+
+        .citation-text {
+            color: #666;
+            font-size: 13px;
+            font-style: italic;
+        }
+
+        .confidence-badge {
+            display: inline-block;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            margin: 5px 5px 5px 0;
+        }
+
+        .confidence-high {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .confidence-medium {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .confidence-low {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #667eea;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-right: 10px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        @media (max-width: 600px) {
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+
+            .header h1 {
+                font-size: 22px;
+            }
         }
     </style>
 </head>
-<body class="bg-gray-50" v-cloak>
-    <div id="app">
+<body>
+    <div class="container">
         <!-- Header -->
-        <div class="gradient-bg text-white py-8 shadow-lg">
-            <div class="max-w-6xl mx-auto px-4">
-                <h1 class="text-4xl font-bold mb-2">🔬 RAG Scientific Research</h1>
-                <p class="text-lg opacity-90">Evidence-Grounded Answers with Complete Audit Trails</p>
-            </div>
+        <div class="header">
+            <h1>🔬 RAG Scientific Research System</h1>
+            <p>Evidence-Grounded Answers with Complete Audit Trails</p>
         </div>
 
-        <div class="max-w-6xl mx-auto px-4 py-8">
-            <!-- Configuration Panel -->
-            <div v-if="!apiKeyConfigured" class="bg-white rounded-lg shadow-md p-6 mb-8">
-                <h2 class="text-2xl font-bold mb-4 flex items-center">
-                    <span class="text-2xl mr-3">🔑</span> Configure Anthropic API
-                </h2>
+        <!-- Config Panel -->
+        <div id="configPanel" class="card">
+            <h2>🔑 Configure API</h2>
+            <div class="form-group">
+                <label for="apiKey">Anthropic API Key</label>
+                <input type="password" id="apiKey" placeholder="sk-ant-..." />
+                <p style="color: #666; font-size: 12px; margin-top: 5px;">
+                    Get your key from <a href="https://console.anthropic.com" target="_blank">console.anthropic.com</a>
+                </p>
+            </div>
+            <div class="button-group">
+                <button class="btn-primary" onclick="configureApi()">✓ Configure API</button>
+                <button class="btn-secondary" onclick="useDemoMode()">🧪 Use Demo Mode</button>
+            </div>
+            <div id="configError" class="error hidden"></div>
+        </div>
 
-                <div class="space-y-4">
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-2">
-                            Anthropic API Key
-                        </label>
-                        <input
-                            v-model="apiKey"
-                            type="password"
-                            placeholder="sk-ant-..."
-                            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
-                        />
-                        <p class="text-sm text-gray-500 mt-2">
-                            Get your API key from <a href="https://console.anthropic.com" target="_blank" class="text-purple-600 hover:underline">Anthropic Console</a>
-                        </p>
-                    </div>
+        <!-- API Configured Badge -->
+        <div id="configSuccess" class="info hidden">
+            ✓ API Configured <span id="modeLabel"></span>
+            <button class="btn-secondary" style="float: right;" onclick="resetApi()">Change API</button>
+        </div>
 
-                    <div class="flex gap-4">
-                        <button
-                            @click="configureApi"
-                            :disabled="!apiKey || loading"
-                            class="flex-1 bg-purple-600 hover:bg-purple-700 disabled:bg-gray-400 text-white px-6 py-2 rounded-lg font-medium transition"
-                        >
-                            <span v-if="!loading">✓ Configure</span>
-                            <span v-else>Configuring...</span>
-                        </button>
-                        <button
-                            @click="useStubMode"
-                            class="flex-1 bg-gray-500 hover:bg-gray-600 text-white px-6 py-2 rounded-lg font-medium transition"
-                        >
-                            🧪 Use Demo Mode
-                        </button>
-                    </div>
+        <!-- Query Form -->
+        <div id="queryPanel" class="card hidden">
+            <h2>❓ Submit Research Query</h2>
 
-                    <div v-if="error" class="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg">
-                        {{ error }}
-                    </div>
+            <div class="form-group">
+                <label for="question">Research Question *</label>
+                <input type="text" id="question" placeholder="e.g., What is the efficacy of drug X for condition Y?" />
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="domain">Domain *</label>
+                    <select id="domain">
+                        <option value="">Select Domain</option>
+                        <option value="pharmacology">Pharmacology</option>
+                        <option value="immunology">Immunology</option>
+                        <option value="oncology">Oncology</option>
+                        <option value="infectious_disease">Infectious Disease</option>
+                        <option value="cardiology">Cardiology</option>
+                        <option value="neurology">Neurology</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="userId">Your ID *</label>
+                    <input type="text" id="userId" placeholder="researcher_01" />
                 </div>
             </div>
 
-            <!-- API Configured Badge -->
-            <div v-else class="mb-6 flex items-center gap-4">
-                <div class="bg-green-50 border border-green-200 text-green-700 px-4 py-3 rounded-lg flex-1">
-                    ✓ API Configured <span v-if="usingStubMode">(Demo Mode)</span>
-                </div>
-                <button
-                    @click="resetApi"
-                    class="bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded-lg font-medium transition"
-                >
-                    Change API
-                </button>
+            <div class="form-group">
+                <label for="context">Context (Optional)</label>
+                <textarea id="context" placeholder="Additional context about your research..."></textarea>
             </div>
 
-            <!-- Query Form -->
-            <div class="bg-white rounded-lg shadow-md p-6 mb-8">
-                <h2 class="text-2xl font-bold mb-4 flex items-center">
-                    <span class="text-2xl mr-3">❓</span> Submit Research Query
-                </h2>
+            <button class="btn-primary" onclick="submitQuery()">🚀 Submit Query</button>
+            <div id="queryError" class="error hidden"></div>
+        </div>
 
-                <div class="space-y-4">
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-2">
-                            Research Question *
-                        </label>
-                        <input
-                            v-model="query.question"
-                            placeholder="e.g., What is the efficacy of drug X for condition Y?"
-                            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
-                        />
-                    </div>
+        <!-- Results -->
+        <div id="resultsPanel" class="card hidden">
+            <h2>📊 Research Response</h2>
 
-                    <div class="grid grid-cols-2 gap-4">
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-2">
-                                Domain *
-                            </label>
-                            <select
-                                v-model="query.domain"
-                                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
-                            >
-                                <option value="">Select Domain</option>
-                                <option value="pharmacology">Pharmacology</option>
-                                <option value="immunology">Immunology</option>
-                                <option value="oncology">Oncology</option>
-                                <option value="infectious_disease">Infectious Disease</option>
-                                <option value="cardiology">Cardiology</option>
-                                <option value="neurology">Neurology</option>
-                            </select>
-                        </div>
-
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-2">
-                                Your ID *
-                            </label>
-                            <input
-                                v-model="query.userId"
-                                placeholder="researcher_01"
-                                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
-                            />
-                        </div>
-                    </div>
-
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-2">
-                            Context (Optional)
-                        </label>
-                        <textarea
-                            v-model="query.context"
-                            placeholder="Additional context about your research..."
-                            rows="3"
-                            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
-                        ></textarea>
-                    </div>
-
-                    <button
-                        @click="submitQuery"
-                        :disabled="!query.question || !query.domain || !query.userId || loading"
-                        class="w-full bg-purple-600 hover:bg-purple-700 disabled:bg-gray-400 text-white px-6 py-3 rounded-lg font-medium text-lg transition"
-                    >
-                        <span v-if="!loading">🚀 Submit Query</span>
-                        <span v-else>Analyzing sources...</span>
-                    </button>
-
-                    <div v-if="error" class="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg">
-                        {{ error }}
-                    </div>
+            <div style="margin-bottom: 20px;">
+                <strong>Audit ID:</strong> <span id="auditId" style="font-family: monospace;"></span>
+                <div style="margin-top: 10px;">
+                    <span id="confidenceBadge" class="confidence-badge"></span>
                 </div>
             </div>
 
-            <!-- Results -->
-            <div v-if="response" class="space-y-6">
-                <!-- Response Card -->
-                <div class="bg-white rounded-lg shadow-md p-6">
-                    <div class="flex items-center justify-between mb-4">
-                        <h2 class="text-2xl font-bold flex items-center">
-                            <span class="text-2xl mr-3">📊</span> Research Response
-                        </h2>
-                        <div class="flex gap-2">
-                            <span :class="confidenceClass(response.confidence)" class="px-3 py-1 rounded-full text-sm font-medium">
-                                {{ response.confidence.toUpperCase() }} Confidence
-                            </span>
-                            <span class="bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm font-medium">
-                                Audit: {{ response.audit_id }}
-                            </span>
-                        </div>
-                    </div>
+            <h3 style="color: #333; margin: 20px 0 10px 0;">Answer</h3>
+            <div id="answerBox" class="response-box"></div>
 
-                    <div class="mb-6">
-                        <h3 class="font-semibold text-gray-900 mb-3 flex items-center">
-                            <span class="text-lg mr-2">💡</span> Answer
-                        </h3>
-                        <div class="result-box p-4 text-gray-700 leading-relaxed whitespace-pre-wrap">
-                            {{ response.answer }}
-                        </div>
-                    </div>
+            <h3 style="color: #333; margin: 20px 0 10px 0;">Citations</h3>
+            <div id="citationsBox"></div>
 
-                    <!-- Citations -->
-                    <div v-if="response.citations && response.citations.length" class="mb-6">
-                        <h3 class="font-semibold text-gray-900 mb-3 flex items-center">
-                            <span class="text-lg mr-2">📖</span> Citations ({{ response.citations.length }})
-                        </h3>
-                        <div class="space-y-3">
-                            <div
-                                v-for="(citation, idx) in response.citations"
-                                :key="idx"
-                                class="result-box p-4"
-                            >
-                                <div class="flex items-start gap-3">
-                                    <div class="flex-1">
-                                        <p class="font-medium text-gray-900">
-                                            [{{ citation.source_id }}] {{ citation.source_name }}
-                                        </p>
-                                        <p class="text-sm text-gray-600 mt-1 italic">{{ citation.text }}</p>
-                                        <div class="flex gap-4 mt-2 text-xs">
-                                            <span :class="confidentClass(citation.confidence)" class="px-2 py-1 rounded">
-                                                Confidence: {{ (citation.confidence * 100).toFixed(0) }}%
-                                            </span>
-                                            <span v-if="citation.validated" class="text-green-600">✓ Validated</span>
-                                            <span v-else class="text-yellow-600">⚠ Unvalidated</span>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+            <h3 style="color: #333; margin: 20px 0 10px 0;">Knowledge Gaps</h3>
+            <div id="gapsBox"></div>
 
-                    <!-- Knowledge Gaps -->
-                    <div v-if="response.gaps && response.gaps.length" class="mb-6">
-                        <h3 class="font-semibold text-gray-900 mb-3 flex items-center">
-                            <span class="text-lg mr-2">⚠️</span> Knowledge Gaps
-                        </h3>
-                        <div class="space-y-2">
-                            <div v-for="gap in response.gaps" :key="gap" class="bg-yellow-50 border border-yellow-200 p-3 rounded text-yellow-800 text-sm">
-                                • {{ gap }}
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Review Status -->
-                    <div class="mb-6">
-                        <div :class="reviewStatusClass" class="p-4 rounded-lg">
-                            <p class="font-semibold">
-                                <span v-if="response.reviewer_required">📋 Requires Reviewer Sign-off</span>
-                                <span v-else>✓ Approved (No review needed)</span>
-                            </p>
-                        </div>
-                    </div>
-
-                    <!-- Action Buttons -->
-                    <div class="flex gap-4">
-                        <button
-                            @click="exportAudit"
-                            class="flex-1 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-medium transition"
-                        >
-                            📥 Export Audit Trail
-                        </button>
-                        <button
-                            @click="resetForm"
-                            class="flex-1 bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded-lg font-medium transition"
-                        >
-                            🔄 New Query
-                        </button>
-                    </div>
-                </div>
-
-                <!-- Audit Timeline -->
-                <div class="bg-white rounded-lg shadow-md p-6">
-                    <h2 class="text-2xl font-bold mb-4 flex items-center">
-                        <span class="text-2xl mr-3">📅</span> Audit Trail Timeline
-                    </h2>
-                    <div class="space-y-4">
-                        <div
-                            v-for="(event, idx) in auditTimeline"
-                            :key="idx"
-                            class="flex gap-4 pb-4 border-b border-gray-200 last:border-b-0"
-                        >
-                            <div class="text-2xl">{{ timelineIcon(event.action) }}</div>
-                            <div class="flex-1">
-                                <p class="font-semibold text-gray-900 capitalize">{{ event.action }}</p>
-                                <p class="text-sm text-gray-500">{{ formatTime(event.timestamp) }}</p>
-                                <p v-if="event.decision" class="text-sm text-gray-700 mt-1">
-                                    Decision: <span class="font-medium">{{ event.decision }}</span>
-                                </p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Empty State -->
-            <div v-else-if="apiKeyConfigured" class="text-center py-12">
-                <p class="text-gray-500 text-lg">Submit a research query above to get started</p>
+            <div style="margin-top: 20px;">
+                <button class="btn-primary" onclick="resetForm()" style="grid-column: auto;">🔄 New Query</button>
+                <button class="btn-secondary" onclick="exportAudit()" style="margin-left: 10px;">📥 Export Audit Trail</button>
             </div>
         </div>
     </div>
 
     <script>
-        const { createApp } = Vue;
+        let apiKeyConfigured = false;
+        let currentApiKey = null;
+        let usingStubMode = false;
 
-        createApp({
-            data() {
-                return {
-                    apiKey: '',
-                    apiKeyConfigured: false,
-                    usingStubMode: false,
-                    loading: false,
-                    error: null,
-                    query: {
-                        question: '',
-                        domain: '',
-                        userId: '',
-                        context: ''
-                    },
-                    response: null,
-                    auditTimeline: []
-                };
-            },
-            methods: {
-                configureApi() {
-                    if (!this.apiKey) {
-                        this.error = 'Please enter your Groq API key';
-                        return;
-                    }
-                    this.apiKeyConfigured = true;
-                    this.usingStubMode = false;
-                    this.error = null;
-                    localStorage.setItem('groqApiKey', this.apiKey);
-                },
-                useStubMode() {
-                    this.apiKeyConfigured = true;
-                    this.usingStubMode = true;
-                    this.error = null;
-                },
-                resetApi() {
-                    this.apiKeyConfigured = false;
-                    this.usingStubMode = false;
-                    this.apiKey = '';
-                    this.response = null;
-                    localStorage.removeItem('groqApiKey');
-                },
-                async submitQuery() {
-                    if (!this.query.question || !this.query.domain || !this.query.userId) {
-                        this.error = 'Please fill in all required fields';
-                        return;
-                    }
-
-                    this.loading = true;
-                    this.error = null;
-
-                    try {
-                        const params = new URLSearchParams({
-                            question: this.query.question,
-                            domain: this.query.domain,
-                            user_id: this.query.userId,
-                            context: this.query.context,
-                            use_stub: this.usingStubMode ? 'true' : 'false',
-                            ...(this.apiKey && { api_key: this.apiKey })
-                        });
-
-                        const response = await fetch(`/api/query?${params}`, {
-                            method: 'POST',
-                            headers: { 'Content-Type': 'application/json' }
-                        });
-
-                        if (!response.ok) {
-                            const error = await response.json();
-                            throw new Error(error.detail || 'Failed to submit query');
-                        }
-
-                        this.response = await response.json();
-                        this.auditTimeline = this.response.timeline || [];
-
-                        // Scroll to results
-                        setTimeout(() => {
-                            document.querySelector('.bg-white:last-of-type')?.scrollIntoView({ behavior: 'smooth' });
-                        }, 100);
-                    } catch (err) {
-                        this.error = err.message;
-                    } finally {
-                        this.loading = false;
-                    }
-                },
-                async exportAudit() {
-                    if (!this.response) return;
-
-                    try {
-                        const data = await fetch(`/api/audit/${this.response.audit_id}`).then(r => r.json());
-
-                        const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
-                        const url = URL.createObjectURL(blob);
-                        const a = document.createElement('a');
-                        a.href = url;
-                        a.download = `audit_${this.response.audit_id}.json`;
-                        a.click();
-                        URL.revokeObjectURL(url);
-                    } catch (err) {
-                        this.error = 'Failed to export audit trail';
-                    }
-                },
-                resetForm() {
-                    this.query = { question: '', domain: '', userId: '', context: '' };
-                    this.response = null;
-                    this.auditTimeline = [];
-                    this.error = null;
-                },
-                confidenceClass(confidence) {
-                    const classes = {
-                        'high': 'bg-green-100 text-green-800',
-                        'medium': 'bg-yellow-100 text-yellow-800',
-                        'low': 'bg-red-100 text-red-800'
-                    };
-                    return classes[confidence] || 'bg-gray-100 text-gray-800';
-                },
-                confidentClass(confidence) {
-                    if (confidence >= 0.9) return 'bg-green-100 text-green-800';
-                    if (confidence >= 0.7) return 'bg-yellow-100 text-yellow-800';
-                    return 'bg-red-100 text-red-800';
-                },
-                get reviewStatusClass() {
-                    return this.response?.reviewer_required
-                        ? 'bg-blue-50 border border-blue-200 text-blue-800'
-                        : 'bg-green-50 border border-green-200 text-green-800';
-                },
-                timelineIcon(action) {
-                    const icons = {
-                        'query_submitted': '📋',
-                        'sources_retrieved': '📚',
-                        'answer_generated': '💡',
-                        'reviewed': '✓',
-                        'decision_made': '✅'
-                    };
-                    return icons[action] || '•';
-                },
-                formatTime(timestamp) {
-                    if (!timestamp) return '';
-                    return new Date(timestamp).toLocaleString();
-                }
-            },
-            mounted() {
-                // Load saved API key if exists
-                const saved = localStorage.getItem('groqApiKey');
-                if (saved) {
-                    this.apiKey = saved;
-                }
+        function configureApi() {
+            const apiKey = document.getElementById('apiKey').value;
+            if (!apiKey) {
+                showError('configError', 'Please enter your Anthropic API key');
+                return;
             }
-        }).mount('#app');
+            apiKeyConfigured = true;
+            currentApiKey = apiKey;
+            usingStubMode = false;
+            showConfigured('(Anthropic API)');
+        }
+
+        function useDemoMode() {
+            apiKeyConfigured = true;
+            currentApiKey = null;
+            usingStubMode = true;
+            showConfigured('(Demo Mode)');
+        }
+
+        function showConfigured(label) {
+            document.getElementById('configPanel').classList.add('hidden');
+            document.getElementById('configSuccess').classList.remove('hidden');
+            document.getElementById('modeLabel').textContent = label;
+            document.getElementById('queryPanel').classList.remove('hidden');
+        }
+
+        function resetApi() {
+            apiKeyConfigured = false;
+            currentApiKey = null;
+            usingStubMode = false;
+            document.getElementById('apiKey').value = '';
+            document.getElementById('configPanel').classList.remove('hidden');
+            document.getElementById('configSuccess').classList.add('hidden');
+            document.getElementById('queryPanel').classList.add('hidden');
+            document.getElementById('resultsPanel').classList.add('hidden');
+            document.getElementById('configError').classList.add('hidden');
+        }
+
+        async function submitQuery() {
+            const question = document.getElementById('question').value;
+            const domain = document.getElementById('domain').value;
+            const userId = document.getElementById('userId').value;
+            const context = document.getElementById('context').value;
+
+            if (!question || !domain || !userId) {
+                showError('queryError', 'Please fill in all required fields');
+                return;
+            }
+
+            const btn = event.target;
+            btn.disabled = true;
+            btn.innerHTML = '<span class="loading"></span>Analyzing...';
+
+            try {
+                const params = new URLSearchParams({
+                    question,
+                    domain,
+                    user_id: userId,
+                    context,
+                    use_stub: usingStubMode ? 'true' : 'false',
+                    ...(currentApiKey && { api_key: currentApiKey })
+                });
+
+                const response = await fetch(`/api/query?${params}`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' }
+                });
+
+                if (!response.ok) {
+                    const error = await response.json();
+                    throw new Error(error.detail || 'Failed to submit query');
+                }
+
+                const data = await response.json();
+                displayResults(data);
+                document.getElementById('queryError').classList.add('hidden');
+            } catch (error) {
+                showError('queryError', error.message);
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = '🚀 Submit Query';
+            }
+        }
+
+        function displayResults(data) {
+            document.getElementById('resultsPanel').classList.remove('hidden');
+            document.getElementById('auditId').textContent = data.audit_id;
+
+            // Confidence badge
+            const badge = document.getElementById('confidenceBadge');
+            badge.textContent = data.confidence.toUpperCase() + ' Confidence';
+            badge.className = `confidence-badge confidence-${data.confidence}`;
+
+            // Answer
+            document.getElementById('answerBox').textContent = data.answer;
+
+            // Citations
+            const citationsBox = document.getElementById('citationsBox');
+            if (data.citations && data.citations.length) {
+                citationsBox.innerHTML = data.citations.map((c, i) => `
+                    <div class="citation">
+                        <div class="citation-source">${i + 1}. [${c.source_id}] ${c.source_name}</div>
+                        <div class="citation-text">"${c.text}"</div>
+                        <div style="margin-top: 8px; font-size: 12px; color: #666;">
+                            Confidence: ${(c.confidence * 100).toFixed(0)}% |
+                            ${c.validated ? '✓ Validated' : '⚠ Unvalidated'}
+                        </div>
+                    </div>
+                `).join('');
+            } else {
+                citationsBox.innerHTML = '<p style="color: #666;">No citations available</p>';
+            }
+
+            // Gaps
+            const gapsBox = document.getElementById('gapsBox');
+            if (data.gaps && data.gaps.length) {
+                gapsBox.innerHTML = data.gaps.map(g =>
+                    `<div style="color: #666; margin-bottom: 8px;">• ${g}</div>`
+                ).join('');
+            } else {
+                gapsBox.innerHTML = '<p style="color: #666;">No gaps identified</p>';
+            }
+
+            // Store for export
+            window.currentResponse = data;
+        }
+
+        function resetForm() {
+            document.getElementById('question').value = '';
+            document.getElementById('domain').value = '';
+            document.getElementById('userId').value = '';
+            document.getElementById('context').value = '';
+            document.getElementById('resultsPanel').classList.add('hidden');
+        }
+
+        async function exportAudit() {
+            if (!window.currentResponse) return;
+
+            try {
+                const data = await fetch(`/api/audit/${window.currentResponse.audit_id}`).then(r => r.json());
+                const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `audit_${window.currentResponse.audit_id}.json`;
+                a.click();
+                URL.revokeObjectURL(url);
+            } catch (error) {
+                showError('error', 'Failed to export audit trail');
+            }
+        }
+
+        function showError(elementId, message) {
+            const el = document.getElementById(elementId);
+            el.textContent = message;
+            el.classList.remove('hidden');
+        }
     </script>
 </body>
 </html>
