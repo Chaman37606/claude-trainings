@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Banner Health · AI Clinical Assistant</title>
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+  <header class="app-header">
+    <div class="app-header-inner">
+      <div>
+        <h1>Banner Health <span class="header-divider">&middot;</span> AI Clinical Assistant</h1>
+        <p class="app-subtitle">Pre-visit summaries and AI-drafted encounter notes, with physician review before anything is signed.</p>
+      </div>
+      <div class="header-badge" id="global-status-badge" hidden></div>
+    </div>
+  </header>
+
+  <div class="app-layout">
+
+    <!-- Patient selector sidebar -->
+    <aside class="sidebar" aria-label="Patient selector">
+      <h2 class="sidebar-title">Patients</h2>
+      <div id="patient-list-status" class="inline-status">Loading patients&hellip;</div>
+      <ul id="patient-list" class="patient-list" data-testid="patient-list"></ul>
+    </aside>
+
+    <!-- Main content -->
+    <main class="main-content">
+
+      <!-- Empty state when no patient selected -->
+      <div id="no-patient-selected" class="empty-state">
+        <p>Select a patient from the list to view their pre-visit summary and start an encounter.</p>
+      </div>
+
+      <div id="patient-workspace" hidden>
+
+        <!-- Patient header -->
+        <div class="patient-banner" id="patient-banner"></div>
+
+        <!-- Pre-Visit Summary -->
+        <section class="panel" id="summary-panel" aria-labelledby="summary-heading">
+          <div class="panel-header">
+            <h2 id="summary-heading">Pre-Visit Summary</h2>
+            <span class="panel-sub">Ranked by clinical relevance</span>
+          </div>
+          <div id="summary-status" class="inline-status"></div>
+          <ul id="summary-list" class="summary-list" data-testid="summary-list"></ul>
+        </section>
+
+        <!-- Full Timeline (collapsible) -->
+        <section class="panel" id="timeline-panel" aria-labelledby="timeline-heading">
+          <div class="panel-header collapsible-header" id="timeline-toggle" data-testid="timeline-toggle">
+            <h2 id="timeline-heading">Full Timeline</h2>
+            <button type="button" class="disclosure-btn" id="timeline-disclosure-btn" aria-expanded="false" aria-controls="timeline-body">
+              Show full history <span class="chevron">&#9656;</span>
+            </button>
+          </div>
+          <div id="timeline-body" class="timeline-body" hidden>
+            <div id="timeline-status" class="inline-status"></div>
+            <ul id="timeline-list" class="timeline-list" data-testid="timeline-list"></ul>
+          </div>
+        </section>
+
+        <!-- New Encounter -->
+        <section class="panel" id="new-encounter-panel" aria-labelledby="encounter-heading">
+          <div class="panel-header">
+            <h2 id="encounter-heading">New Encounter</h2>
+          </div>
+          <form id="new-encounter-form" novalidate>
+            <div class="form-row">
+              <label for="encounter-type">Encounter type</label>
+              <select id="encounter-type" name="encounter-type" data-testid="encounter-type-select">
+                <option value="Office Visit">Office Visit</option>
+                <option value="Follow-up">Follow-up</option>
+                <option value="Telehealth">Telehealth</option>
+                <option value="Other">Other</option>
+              </select>
+            </div>
+            <div class="form-row">
+              <label for="encounter-transcript">Encounter transcript</label>
+              <textarea id="encounter-transcript" name="encounter-transcript" rows="8"
+                placeholder="Paste or type the encounter transcript here (physician-patient dialogue, dictation, or notes)&hellip;"
+                data-testid="encounter-transcript-input"></textarea>
+            </div>
+            <div class="form-actions">
+              <button type="submit" id="start-encounter-btn" class="btn btn-primary" data-testid="start-encounter-btn">Start Encounter</button>
+              <span id="encounter-status" class="inline-status"></span>
+            </div>
+          </form>
+        </section>
+
+        <!-- Draft Note Editor -->
+        <section class="panel" id="draft-panel" hidden aria-labelledby="draft-heading">
+          <div class="panel-header">
+            <h2 id="draft-heading">Draft SOAP Note</h2>
+            <span id="draft-status-badge" class="status-badge status-draft" data-testid="draft-status-badge">Draft</span>
+          </div>
+          <div id="draft-meta" class="draft-meta"></div>
+          <div id="draft-status" class="inline-status"></div>
+
+          <div class="soap-grid">
+            <div class="soap-field">
+              <label for="draft-subjective">Subjective</label>
+              <textarea id="draft-subjective" rows="6" data-testid="draft-subjective"></textarea>
+            </div>
+            <div class="soap-field">
+              <label for="draft-objective">Objective</label>
+              <textarea id="draft-objective" rows="6" data-testid="draft-objective"></textarea>
+            </div>
+            <div class="soap-field">
+              <label for="draft-assessment">Assessment</label>
+              <textarea id="draft-assessment" rows="6" data-testid="draft-assessment"></textarea>
+            </div>
+            <div class="soap-field">
+              <label for="draft-plan">Plan</label>
+              <textarea id="draft-plan" rows="6" data-testid="draft-plan"></textarea>
+            </div>
+          </div>
+
+          <div class="form-actions">
+            <button type="button" id="save-draft-btn" class="btn btn-secondary" data-testid="save-draft-btn">Save Edits</button>
+            <button type="button" id="approve-draft-btn" class="btn btn-primary" data-testid="approve-draft-btn">Approve &amp; Sign</button>
+            <span id="draft-action-status" class="inline-status"></span>
+          </div>
+
+          <!-- Inline approval prompt (not window.prompt) -->
+          <div id="approve-inline-form" class="approve-inline-form" hidden data-testid="approve-inline-form">
+            <label for="approved-by-input">Physician name to sign this note</label>
+            <div class="approve-inline-row">
+              <input type="text" id="approved-by-input" placeholder="e.g. Dr. Jane Smith" data-testid="approved-by-input">
+              <button type="button" id="confirm-approve-btn" class="btn btn-primary" data-testid="confirm-approve-btn">Confirm Sign</button>
+              <button type="button" id="cancel-approve-btn" class="btn btn-ghost" data-testid="cancel-approve-btn">Cancel</button>
+            </div>
+          </div>
+        </section>
+
+        <!-- Audit Trail -->
+        <section class="panel" id="audit-panel" aria-labelledby="audit-heading">
+          <div class="panel-header">
+            <h2 id="audit-heading">Audit Trail</h2>
+            <label class="audit-filter-label">
+              <input type="checkbox" id="audit-filter-checkbox" data-testid="audit-filter-checkbox">
+              Show only this encounter
+            </label>
+          </div>
+          <div id="audit-status" class="inline-status"></div>
+          <div class="table-container">
+            <table id="audit-table" data-testid="audit-table">
+              <thead>
+                <tr>
+                  <th>Timestamp</th>
+                  <th>Action</th>
+                  <th>Actor</th>
+                  <th>Detail</th>
+                </tr>
+              </thead>
+              <tbody id="audit-table-body"></tbody>
+            </table>
+          </div>
+        </section>
+
+      </div>
+    </main>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
