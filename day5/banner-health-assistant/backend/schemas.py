@@ -1,7 +1,28 @@
 from datetime import date, datetime
 from typing import Any, Dict, List, Optional
 
-from pydantic import BaseModel, ConfigDict
+from pydantic import BaseModel, ConfigDict, Field
+
+
+# ---------- Auth ----------
+
+class UserCreate(BaseModel):
+    username: str
+    full_name: str
+    password: str = Field(min_length=8, max_length=72)  # 72 bytes is bcrypt's hard limit
+
+
+class UserOut(BaseModel):
+    id: int
+    username: str
+    full_name: str
+
+    model_config = ConfigDict(from_attributes=True)
+
+
+class Token(BaseModel):
+    access_token: str
+    token_type: str = "bearer"
 
 
 # ---------- Patients ----------
@@ -99,10 +120,6 @@ class DraftNoteUpdate(BaseModel):
     objective: Optional[str] = None
     assessment: Optional[str] = None
     plan: Optional[str] = None
-
-
-class ApproveRequest(BaseModel):
-    approved_by: str
 
 
 # ---------- Audit log ----------

@@ -12,8 +12,9 @@ from datetime import date, timedelta
 from sqlalchemy.orm import Session
 
 import crud
+from auth import hash_password
 from database import SessionLocal
-from models import Patient
+from models import Patient, User
 
 
 def _days_ago(n: int) -> date:
@@ -71,23 +72,35 @@ _TIMELINE_EVENTS = {
 }
 
 
-def seed_if_empty(db: Session) -> None:
-    """Insert demo patients + timeline events only if the DB has no patients yet."""
-    if db.query(Patient).count() > 0:
-        return
+# Demo-only accounts, seeded so the app is usable out of the box. Each tuple:
+# (username, full_name, password). Never do this in a real deployment — see
+# SECURITY.md.
+_DEMO_USERS = [
+    ("dr.chen", "Dr. Sarah Chen", "demo1234"),
+    ("dr.patel", "Dr. Raj Patel", "demo1234"),
+]
 
-    for name, mrn, dob in _PATIENTS:
-        patient = crud.create_patient(db, name=name, mrn=mrn, dob=dob)
-        for category, description, days_ago, is_active, is_recent_change in _TIMELINE_EVENTS[mrn]:
-            crud.create_timeline_event(
-                db,
-                patient_id=patient.id,
-                category=category,
-                description=description,
-                event_date=_days_ago(days_ago),
-                is_active=is_active,
-                is_recent_change=is_recent_change,
-            )
+
+def seed_if_empty(db: Session) -> None:
+    """Insert demo patients/timeline events and demo user accounts, each guarded
+    independently so the two seed sets don't depend on each other's presence."""
+    if db.query(Patient).count() == 0:
+        for name, mrn, dob in _PATIENTS:
+            patient = crud.create_patient(db, name=name, mrn=mrn, dob=dob)
+            for category, description, days_ago, is_active, is_recent_change in _TIMELINE_EVENTS[mrn]:
+                crud.create_timeline_event(
+                    db,
+                    patient_id=patient.id,
+                    category=category,
+                    description=description,
+                    event_date=_days_ago(days_ago),
+                    is_active=is_active,
+                    is_recent_change=is_recent_change,
+                )
+
+    if db.query(User).count() == 0:
+        for username, full_name, password in _DEMO_USERS:
+            crud.create_user(db, username=username, full_name=full_name, hashed_password=hash_password(password))
 
 
 def run() -> None:

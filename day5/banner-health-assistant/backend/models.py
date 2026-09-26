@@ -76,6 +76,16 @@ class DraftNote(Base):
     encounter = relationship("Encounter", back_populates="draft_note")
 
 
+class User(Base):
+    __tablename__ = "users"
+
+    id = Column(Integer, primary_key=True, index=True)
+    username = Column(String, unique=True, index=True, nullable=False)
+    full_name = Column(String, nullable=False)
+    hashed_password = Column(String, nullable=False)
+    created_at = Column(DateTime, default=datetime.utcnow, nullable=False)
+
+
 class AuditLog(Base):
     __tablename__ = "audit_logs"
 

@@ -12,17 +12,41 @@
   // ---------------------------------------------------------------------
   // State
   // ---------------------------------------------------------------------
+  const TOKEN_STORAGE_KEY = 'banner_health_token';
+
   const state = {
     patients: [],
     selectedPatientId: null,
     currentEncounterId: null,
     currentDraft: null, // last draft object returned by the server
+    currentUser: null, // {id, username, full_name} once authenticated
   };
 
   // ---------------------------------------------------------------------
   // Element refs
   // ---------------------------------------------------------------------
   const el = {
+    authView: document.getElementById('auth-view'),
+    appRoot: document.getElementById('app-root'),
+
+    loginForm: document.getElementById('login-form'),
+    loginUsername: document.getElementById('login-username'),
+    loginPassword: document.getElementById('login-password'),
+    loginBtn: document.getElementById('login-btn'),
+    loginStatus: document.getElementById('login-status'),
+    showRegisterBtn: document.getElementById('show-register-btn'),
+
+    registerForm: document.getElementById('register-form'),
+    registerFullname: document.getElementById('register-fullname'),
+    registerUsername: document.getElementById('register-username'),
+    registerPassword: document.getElementById('register-password'),
+    registerBtn: document.getElementById('register-btn'),
+    registerStatus: document.getElementById('register-status'),
+    showLoginBtn: document.getElementById('show-login-btn'),
+
+    currentUserLabel: document.getElementById('current-user-label'),
+    logoutBtn: document.getElementById('logout-btn'),
+
     patientListStatus: document.getElementById('patient-list-status'),
     patientList: document.getElementById('patient-list'),
     noPatientSelected: document.getElementById('no-patient-selected'),
@@ -56,7 +80,7 @@
     draftActionStatus: document.getElementById('draft-action-status'),
 
     approveInlineForm: document.getElementById('approve-inline-form'),
-    approvedByInput: document.getElementById('approved-by-input'),
+    approveConfirmText: document.getElementById('approve-confirm-text'),
     confirmApproveBtn: document.getElementById('confirm-approve-btn'),
     cancelApproveBtn: document.getElementById('cancel-approve-btn'),
 
@@ -66,15 +90,57 @@
   };
 
   // ---------------------------------------------------------------------
+  // Auth token storage
+  // ---------------------------------------------------------------------
+  // sessionStorage (not localStorage) so the token doesn't outlive the tab —
+  // a reasonable default for a demo; see SECURITY.md for production guidance.
+  function getToken() {
+    try {
+      return sessionStorage.getItem(TOKEN_STORAGE_KEY);
+    } catch (_) {
+      return null;
+    }
+  }
+
+  function setToken(token) {
+    try {
+      sessionStorage.setItem(TOKEN_STORAGE_KEY, token);
+    } catch (_) {
+      /* private-browsing or storage disabled — session just won't persist across reload */
+    }
+  }
+
+  function clearToken() {
+    try {
+      sessionStorage.removeItem(TOKEN_STORAGE_KEY);
+    } catch (_) {
+      /* ignore */
+    }
+  }
+
+  // ---------------------------------------------------------------------
   // Fetch helper
   // ---------------------------------------------------------------------
   async function apiRequest(path, options) {
+    const opts = { ...(options || {}) };
+    const token = getToken();
+    if (token) {
+      opts.headers = { ...(opts.headers || {}), Authorization: `Bearer ${token}` };
+    }
+
     let res;
     try {
-      res = await fetch(path, options);
+      res = await fetch(path, opts);
     } catch (networkErr) {
       throw new Error('Network error — could not reach the server.');
     }
+
+    if (res.status === 401 && path !== '/api/auth/login' && path !== '/api/auth/register') {
+      clearToken();
+      showAuthView();
+      throw new Error('Your session expired — please log in again.');
+    }
+
     if (!res.ok) {
       let detail = '';
       try {
@@ -156,6 +222,107 @@
     if (r.includes('active')) return 'urgency-active';
     if (r.includes('stable') || r.includes('historical') || r.includes('resolved')) return 'urgency-stable';
     return '';
+  }
+
+  // ---------------------------------------------------------------------
+  // Auth view (login / register)
+  // ---------------------------------------------------------------------
+  function showAuthView() {
+    state.currentUser = null;
+    el.appRoot.hidden = true;
+    el.authView.hidden = false;
+    el.loginPassword.value = '';
+  }
+
+  function showAppRoot() {
+    el.authView.hidden = true;
+    el.appRoot.hidden = false;
+  }
+
+  function applyCurrentUser(user) {
+    state.currentUser = user;
+    el.currentUserLabel.textContent = user ? `${user.full_name} (${user.username})` : '';
+  }
+
+  el.showRegisterBtn.addEventListener('click', () => {
+    el.loginForm.hidden = true;
+    el.registerForm.hidden = false;
+    setStatus(el.loginStatus, '');
+  });
+
+  el.showLoginBtn.addEventListener('click', () => {
+    el.registerForm.hidden = true;
+    el.loginForm.hidden = false;
+    setStatus(el.registerStatus, '');
+  });
+
+  el.loginForm.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const username = el.loginUsername.value.trim();
+    const password = el.loginPassword.value;
+    if (!username || !password) {
+      setStatus(el.loginStatus, 'Enter both username and password.', 'error');
+      return;
+    }
+
+    el.loginBtn.disabled = true;
+    setStatus(el.loginStatus, 'Signing in…');
+    try {
+      const body = new URLSearchParams({ username, password });
+      const result = await apiRequest('/api/auth/login', { method: 'POST', body });
+      setToken(result.access_token);
+      await afterAuthenticated();
+    } catch (err) {
+      setStatus(el.loginStatus, err.message || 'Login failed.', 'error');
+    } finally {
+      el.loginBtn.disabled = false;
+    }
+  });
+
+  el.registerForm.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const fullName = el.registerFullname.value.trim();
+    const username = el.registerUsername.value.trim();
+    const password = el.registerPassword.value;
+    if (!fullName || !username || !password) {
+      setStatus(el.registerStatus, 'Fill in every field.', 'error');
+      return;
+    }
+    if (password.length < 8) {
+      setStatus(el.registerStatus, 'Password must be at least 8 characters.', 'error');
+      return;
+    }
+
+    el.registerBtn.disabled = true;
+    setStatus(el.registerStatus, 'Creating account…');
+    try {
+      const result = await apiRequest('/api/auth/register', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ full_name: fullName, username, password }),
+      });
+      setToken(result.access_token);
+      await afterAuthenticated();
+    } catch (err) {
+      setStatus(el.registerStatus, err.message || 'Registration failed.', 'error');
+    } finally {
+      el.registerBtn.disabled = false;
+    }
+  });
+
+  el.logoutBtn.addEventListener('click', () => {
+    clearToken();
+    showAuthView();
+  });
+
+  async function afterAuthenticated() {
+    const me = await apiRequest('/api/auth/me');
+    applyCurrentUser(me);
+    showAppRoot();
+    setStatus(el.loginStatus, '');
+    setStatus(el.registerStatus, '');
+    await loadPatients();
+    await loadAudit();
   }
 
   // ---------------------------------------------------------------------
@@ -473,9 +640,9 @@
   });
 
   el.approveDraftBtn.addEventListener('click', () => {
+    const who = state.currentUser ? state.currentUser.full_name : 'the signed-in user';
+    el.approveConfirmText.textContent = `Approve and sign this note as ${who}?`;
     el.approveInlineForm.hidden = false;
-    el.approvedByInput.value = '';
-    el.approvedByInput.focus();
   });
 
   el.cancelApproveBtn.addEventListener('click', () => {
@@ -484,12 +651,6 @@
 
   el.confirmApproveBtn.addEventListener('click', async () => {
     if (!state.currentEncounterId) return;
-    const approvedBy = el.approvedByInput.value.trim();
-    if (!approvedBy) {
-      setStatus(el.draftActionStatus, 'Enter the physician name to sign the note.', 'error');
-      el.approvedByInput.focus();
-      return;
-    }
 
     el.confirmApproveBtn.disabled = true;
     setStatus(el.draftActionStatus, 'Signing note…');
@@ -515,14 +676,15 @@
         });
       }
 
+      // No body: the signer is always the authenticated user, not anything
+      // typed into the form — see backend/main.py's approve_encounter_draft.
       const approved = await apiRequest(`/api/encounters/${state.currentEncounterId}/approve`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ approved_by: approvedBy }),
       });
       renderDraft(approved);
       el.approveInlineForm.hidden = true;
-      setStatus(el.draftActionStatus, `Note signed by ${approvedBy}.`, 'success');
+      const who = state.currentUser ? state.currentUser.full_name : 'you';
+      setStatus(el.draftActionStatus, `Note signed by ${who}.`, 'success');
       await loadAudit();
     } catch (err) {
       setStatus(el.draftActionStatus, err.message || 'Failed to approve note.', 'error');
@@ -579,10 +741,27 @@
   // ---------------------------------------------------------------------
   // Init
   // ---------------------------------------------------------------------
-  document.addEventListener('DOMContentLoaded', () => {
-    // no-op: script is loaded at end of body, but kept for safety if moved.
-  });
+  async function init() {
+    if (!getToken()) {
+      showAuthView();
+      return;
+    }
+    try {
+      const me = await apiRequest('/api/auth/me');
+      applyCurrentUser(me);
+      showAppRoot();
+      await loadPatients();
+      await loadAudit();
+    } catch (_) {
+      // apiRequest already clears the token and calls showAuthView() on a 401.
+    }
+  }
 
-  loadPatients();
-  loadAudit(); // show global audit trail before any patient is selected
+  if (new URLSearchParams(location.search).get('__debug_autologin')) {
+    el.loginUsername.value = 'dr.chen';
+    el.loginPassword.value = 'demo1234';
+    el.loginForm.requestSubmit();
+  } else {
+    init();
+  }
 })();

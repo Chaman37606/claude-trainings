@@ -3,6 +3,12 @@ Integration tests for the FastAPI backend, exercising the full documented
 HTTP contract against an isolated, pre-seeded in-memory SQLite database
 (see the `client` fixture in conftest.py). These tests never touch the real
 backend/banner_health.db file's data.
+
+Every `/api/*` route except `/api/health`, `/api/auth/login`, and
+`/api/auth/register` requires a bearer token — see the `auth_headers` fixture
+in conftest.py and `tests/test_auth.py` for the auth-specific coverage
+(login/register/me/401-without-token). These tests assume a valid token and
+focus on the business behavior behind each route.
 """
 
 
@@ -11,8 +17,8 @@ backend/banner_health.db file's data.
 # ---------------------------------------------------------------------------
 
 
-def test_list_patients_returns_seeded_patients(client):
-    resp = client.get("/api/patients")
+def test_list_patients_returns_seeded_patients(client, auth_headers):
+    resp = client.get("/api/patients", headers=auth_headers)
     assert resp.status_code == 200
     patients = resp.json()
     assert len(patients) == 4
@@ -22,13 +28,13 @@ def test_list_patients_returns_seeded_patients(client):
         assert set(p.keys()) >= {"id", "name", "mrn", "dob"}
 
 
-def test_timeline_404_for_unknown_patient(client):
-    resp = client.get("/api/patients/999999/timeline")
+def test_timeline_404_for_unknown_patient(client, auth_headers):
+    resp = client.get("/api/patients/999999/timeline", headers=auth_headers)
     assert resp.status_code == 404
 
 
-def test_summary_404_for_unknown_patient(client):
-    resp = client.get("/api/patients/999999/summary")
+def test_summary_404_for_unknown_patient(client, auth_headers):
+    resp = client.get("/api/patients/999999/summary", headers=auth_headers)
     assert resp.status_code == 404
 
 
@@ -37,11 +43,11 @@ def test_summary_404_for_unknown_patient(client):
 # ---------------------------------------------------------------------------
 
 
-def test_timeline_sorted_descending_and_type_matches_category(client):
-    patients = client.get("/api/patients").json()
+def test_timeline_sorted_descending_and_type_matches_category(client, auth_headers):
+    patients = client.get("/api/patients", headers=auth_headers).json()
     patient_id = patients[0]["id"]
 
-    resp = client.get(f"/api/patients/{patient_id}/timeline")
+    resp = client.get(f"/api/patients/{patient_id}/timeline", headers=auth_headers)
     assert resp.status_code == 200
     body = resp.json()
     assert body["patient_id"] == patient_id
@@ -61,11 +67,11 @@ def test_timeline_sorted_descending_and_type_matches_category(client):
 # ---------------------------------------------------------------------------
 
 
-def test_summary_items_have_non_empty_reason(client):
-    patients = client.get("/api/patients").json()
+def test_summary_items_have_non_empty_reason(client, auth_headers):
+    patients = client.get("/api/patients", headers=auth_headers).json()
     patient_id = patients[0]["id"]
 
-    resp = client.get(f"/api/patients/{patient_id}/summary")
+    resp = client.get(f"/api/patients/{patient_id}/summary", headers=auth_headers)
     assert resp.status_code == 200
     body = resp.json()
     assert body["patient_id"] == patient_id
@@ -81,8 +87,8 @@ def test_summary_items_have_non_empty_reason(client):
 # ---------------------------------------------------------------------------
 
 
-def test_full_encounter_draft_workflow(client):
-    patients = client.get("/api/patients").json()
+def test_full_encounter_draft_workflow(client, auth_headers):
+    patients = client.get("/api/patients", headers=auth_headers).json()
     patient_id = patients[0]["id"]
 
     transcript = (
@@ -96,6 +102,7 @@ def test_full_encounter_draft_workflow(client):
     create_resp = client.post(
         f"/api/patients/{patient_id}/encounters",
         json={"encounter_type": "office_visit", "transcript": transcript},
+        headers=auth_headers,
     )
     assert create_resp.status_code == 200
     encounter = create_resp.json()
@@ -104,7 +111,7 @@ def test_full_encounter_draft_workflow(client):
     assert encounter["transcript"] == transcript
 
     # 2. Generate the draft note.
-    draft_resp = client.post(f"/api/encounters/{encounter_id}/draft")
+    draft_resp = client.post(f"/api/encounters/{encounter_id}/draft", headers=auth_headers)
     assert draft_resp.status_code == 200
     draft = draft_resp.json()
     for field in ("subjective", "objective", "assessment", "plan"):
@@ -114,7 +121,7 @@ def test_full_encounter_draft_workflow(client):
     assert draft["encounter_id"] == encounter_id
 
     # 3. Read the draft back and confirm it matches.
-    read_resp = client.get(f"/api/encounters/{encounter_id}/draft")
+    read_resp = client.get(f"/api/encounters/{encounter_id}/draft", headers=auth_headers)
     assert read_resp.status_code == 200
     read_draft = read_resp.json()
     assert read_draft["subjective"] == draft["subjective"]
@@ -127,7 +134,7 @@ def test_full_encounter_draft_workflow(client):
     old_plan = draft["plan"]
     new_plan = "Plan: follow up in 1 week and start ibuprofen as needed."
     update_resp = client.put(
-        f"/api/encounters/{encounter_id}/draft", json={"plan": new_plan}
+        f"/api/encounters/{encounter_id}/draft", json={"plan": new_plan}, headers=auth_headers
     )
     assert update_resp.status_code == 200
     updated_draft = update_resp.json()
@@ -144,17 +151,18 @@ def test_full_encounter_draft_workflow(client):
     assert entry["old_value"] == old_plan
     assert entry["new_value"] == new_plan
 
-    # 5. Approve the draft.
-    approve_resp = client.post(
-        f"/api/encounters/{encounter_id}/approve", json={"approved_by": "Dr. Test"}
-    )
+    # 5. Approve the draft — no body: the signer is the authenticated user
+    # (dr.chen / "Dr. Sarah Chen", the seeded demo account `auth_headers` logs in as),
+    # not anything the client could type in.
+    approve_resp = client.post(f"/api/encounters/{encounter_id}/approve", headers=auth_headers)
     assert approve_resp.status_code == 200
     approved = approve_resp.json()
     assert approved["status"] == "approved"
     assert approved["finalized_at"] is not None
 
-    # 6. Audit log covers the whole workflow, newest first.
-    audit_resp = client.get(f"/api/audit?encounter_id={encounter_id}")
+    # 6. Audit log covers the whole workflow, newest first, with the real
+    # authenticated identity as actor — not a free-typed string.
+    audit_resp = client.get(f"/api/audit?encounter_id={encounter_id}", headers=auth_headers)
     assert audit_resp.status_code == 200
     audit_entries = audit_resp.json()
 
@@ -162,6 +170,11 @@ def test_full_encounter_draft_workflow(client):
     assert "generate_draft" in actions
     assert "edit_draft" in actions
     assert "approve_note" in actions
+
+    approve_entry = next(e for e in audit_entries if e["action"] == "approve_note")
+    assert approve_entry["actor"] == "Dr. Sarah Chen"
+    edit_entry = next(e for e in audit_entries if e["action"] == "edit_draft")
+    assert edit_entry["actor"] == "dr.chen"
 
     timestamps = [e["timestamp"] for e in audit_entries]
     assert timestamps == sorted(timestamps, reverse=True)
@@ -175,19 +188,37 @@ def test_full_encounter_draft_workflow(client):
 # ---------------------------------------------------------------------------
 
 
-def test_get_draft_404_for_unknown_encounter(client):
-    resp = client.get("/api/encounters/999999/draft")
+def test_get_draft_404_for_unknown_encounter(client, auth_headers):
+    resp = client.get("/api/encounters/999999/draft", headers=auth_headers)
     assert resp.status_code == 404
 
 
-def test_post_draft_404_for_unknown_encounter(client):
-    resp = client.post("/api/encounters/999999/draft")
+def test_post_draft_404_for_unknown_encounter(client, auth_headers):
+    resp = client.post("/api/encounters/999999/draft", headers=auth_headers)
     assert resp.status_code == 404
 
 
-def test_create_encounter_404_for_unknown_patient(client):
+def test_create_encounter_404_for_unknown_patient(client, auth_headers):
     resp = client.post(
         "/api/patients/999999/encounters",
         json={"encounter_type": "office_visit", "transcript": "Patient reports feeling fine."},
+        headers=auth_headers,
     )
     assert resp.status_code == 404
+
+
+# ---------------------------------------------------------------------------
+# Auth is required — spot checks here; full auth behavior in test_auth.py
+# ---------------------------------------------------------------------------
+
+
+def test_protected_routes_401_without_token(client):
+    assert client.get("/api/patients").status_code == 401
+    assert client.get("/api/audit").status_code == 401
+    assert client.post("/api/encounters/1/draft").status_code == 401
+
+
+def test_health_check_does_not_require_auth(client):
+    resp = client.get("/api/health")
+    assert resp.status_code == 200
+    assert resp.json()["status"] == "ok"

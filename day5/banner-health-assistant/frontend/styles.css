@@ -45,6 +45,72 @@ button {
   font-family: inherit;
 }
 
+/* ---------- Auth view ---------- */
+.auth-view {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1.5rem;
+  background: linear-gradient(135deg, var(--primary-dark) 0%, var(--primary) 100%);
+}
+
+.auth-card {
+  background: var(--surface-1);
+  border-radius: var(--radius);
+  box-shadow: 0 8px 30px rgba(15, 40, 60, 0.25);
+  padding: 2rem 2.25rem;
+  width: 100%;
+  max-width: 380px;
+}
+
+.auth-title {
+  font-size: 1.2rem;
+  font-weight: 600;
+  color: var(--ink-900);
+  margin-bottom: 0.35rem;
+}
+
+.auth-subtitle {
+  font-size: 0.85rem;
+  color: var(--ink-500);
+  margin-bottom: 1.25rem;
+}
+
+.auth-form .form-row {
+  margin-bottom: 0.85rem;
+}
+
+.auth-demo-hint {
+  font-size: 0.78rem;
+  color: var(--ink-500);
+  margin-top: 0.9rem;
+}
+
+.auth-demo-hint code {
+  background: var(--surface-2);
+  padding: 0.1rem 0.35rem;
+  border-radius: 4px;
+  font-size: 0.75rem;
+}
+
+.auth-toggle {
+  font-size: 0.85rem;
+  color: var(--ink-700);
+  margin-top: 0.75rem;
+}
+
+.link-btn {
+  background: none;
+  border: none;
+  padding: 0;
+  color: var(--primary);
+  font-weight: 600;
+  cursor: pointer;
+  font-size: inherit;
+  text-decoration: underline;
+}
+
 /* ---------- Header ---------- */
 .app-header {
   background: linear-gradient(135deg, var(--primary-dark) 0%, var(--primary) 100%);
@@ -79,12 +145,26 @@ button {
   margin-top: 0.2rem;
 }
 
-.header-badge {
+.header-right {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  flex-shrink: 0;
+}
+
+.current-user-label {
+  font-size: 0.85rem;
+  opacity: 0.9;
+}
+
+.header-right .btn-ghost {
+  color: #fff;
+  border-color: rgba(255, 255, 255, 0.4);
+}
+
+.header-right .btn-ghost:hover {
+  color: #fff;
   background: rgba(255, 255, 255, 0.15);
-  border: 1px solid rgba(255, 255, 255, 0.35);
-  padding: 0.35rem 0.75rem;
-  border-radius: 999px;
-  font-size: 0.8rem;
 }
 
 /* ---------- Layout ---------- */

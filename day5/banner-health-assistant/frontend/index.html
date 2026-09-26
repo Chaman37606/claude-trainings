@@ -8,13 +8,63 @@
 </head>
 <body>
 
+  <!-- Auth gate: shown until a valid session token exists. -->
+  <div id="auth-view" class="auth-view">
+    <div class="auth-card">
+      <h1 class="auth-title">Banner Health <span class="header-divider">&middot;</span> AI Clinical Assistant</h1>
+      <p class="auth-subtitle">Sign in to view patient records and draft encounter notes.</p>
+
+      <form id="login-form" class="auth-form" data-testid="login-form">
+        <div class="form-row">
+          <label for="login-username">Username</label>
+          <input type="text" id="login-username" autocomplete="username" data-testid="login-username">
+        </div>
+        <div class="form-row">
+          <label for="login-password">Password</label>
+          <input type="password" id="login-password" autocomplete="current-password" data-testid="login-password">
+        </div>
+        <div class="form-actions">
+          <button type="submit" id="login-btn" class="btn btn-primary" data-testid="login-btn">Log in</button>
+          <span id="login-status" class="inline-status"></span>
+        </div>
+        <p class="auth-demo-hint">Demo accounts: <code>dr.chen</code> / <code>demo1234</code> or <code>dr.patel</code> / <code>demo1234</code></p>
+        <p class="auth-toggle">No account? <button type="button" id="show-register-btn" class="link-btn" data-testid="show-register-btn">Create one</button></p>
+      </form>
+
+      <form id="register-form" class="auth-form" data-testid="register-form" hidden>
+        <div class="form-row">
+          <label for="register-fullname">Full name</label>
+          <input type="text" id="register-fullname" autocomplete="name" data-testid="register-fullname">
+        </div>
+        <div class="form-row">
+          <label for="register-username">Username</label>
+          <input type="text" id="register-username" autocomplete="username" data-testid="register-username">
+        </div>
+        <div class="form-row">
+          <label for="register-password">Password (min 8 characters)</label>
+          <input type="password" id="register-password" autocomplete="new-password" data-testid="register-password">
+        </div>
+        <div class="form-actions">
+          <button type="submit" id="register-btn" class="btn btn-primary" data-testid="register-btn">Create account</button>
+          <span id="register-status" class="inline-status"></span>
+        </div>
+        <p class="auth-toggle">Already have an account? <button type="button" id="show-login-btn" class="link-btn" data-testid="show-login-btn">Log in</button></p>
+      </form>
+    </div>
+  </div>
+
+  <div id="app-root" hidden>
+
   <header class="app-header">
     <div class="app-header-inner">
       <div>
         <h1>Banner Health <span class="header-divider">&middot;</span> AI Clinical Assistant</h1>
         <p class="app-subtitle">Pre-visit summaries and AI-drafted encounter notes, with physician review before anything is signed.</p>
       </div>
-      <div class="header-badge" id="global-status-badge" hidden></div>
+      <div class="header-right">
+        <span id="current-user-label" class="current-user-label"></span>
+        <button type="button" id="logout-btn" class="btn btn-ghost" data-testid="logout-btn">Log out</button>
+      </div>
     </div>
   </header>
 
@@ -126,11 +176,11 @@
             <span id="draft-action-status" class="inline-status"></span>
           </div>
 
-          <!-- Inline approval prompt (not window.prompt) -->
+          <!-- Inline approval confirm (not window.confirm). The signer is always the
+               logged-in account (see auth.py) — there's no name field to type into. -->
           <div id="approve-inline-form" class="approve-inline-form" hidden data-testid="approve-inline-form">
-            <label for="approved-by-input">Physician name to sign this note</label>
+            <p id="approve-confirm-text"></p>
             <div class="approve-inline-row">
-              <input type="text" id="approved-by-input" placeholder="e.g. Dr. Jane Smith" data-testid="approved-by-input">
               <button type="button" id="confirm-approve-btn" class="btn btn-primary" data-testid="confirm-approve-btn">Confirm Sign</button>
               <button type="button" id="cancel-approve-btn" class="btn btn-ghost" data-testid="cancel-approve-btn">Cancel</button>
             </div>
@@ -165,6 +215,8 @@
       </div>
     </main>
   </div>
+
+  </div><!-- /#app-root -->
 
   <script src="app.js"></script>
 </body>

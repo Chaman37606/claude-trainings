@@ -1,0 +1,22 @@
+# Scoped to this project directory (git applies a nested .gitignore to its own subtree).
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+.pytest_cache/
+*.egg-info/
+
+# Runtime data
+backend/*.db
+backend/*.db-journal
+
+# Local env overrides
+.env
+
+# Load-test output
+performance/results/
+
+# Editor/OS noise
+.DS_Store
+*.swp

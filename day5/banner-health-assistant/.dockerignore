@@ -1,0 +1,8 @@
+**/__pycache__/
+**/*.pyc
+.pytest_cache/
+backend/banner_health.db
+performance/results/
+.git/
+.claude/
+*.md

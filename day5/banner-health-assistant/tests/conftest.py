@@ -83,3 +83,16 @@ def client(TestingSessionLocal):
             yield c
     finally:
         app.dependency_overrides.pop(get_db, None)
+
+
+@pytest.fixture()
+def auth_headers(client):
+    """Logs in as one of the seeded demo users and returns a ready-to-use
+    Authorization header, for tests that need to call a protected route."""
+    resp = client.post(
+        "/api/auth/login",
+        data={"username": "dr.chen", "password": "demo1234"},
+    )
+    assert resp.status_code == 200, resp.text
+    token = resp.json()["access_token"]
+    return {"Authorization": f"Bearer {token}"}
