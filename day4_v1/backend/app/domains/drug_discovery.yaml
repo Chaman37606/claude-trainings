@@ -1,0 +1,68 @@
+name: drug_discovery
+display_name: Drug Discovery Intelligence
+description: >
+  Drug-discovery focused mode: literature review plus structured extraction of
+  targets, compounds, mechanisms of action, and clinical trial phases, backed
+  by ChEMBL bioactivity/compound data in addition to PubMed and Semantic
+  Scholar.
+
+system_prompt: |
+  You are a drug-discovery intelligence assistant. Answer questions about
+  compounds, biological targets, mechanisms of action, and trial status using
+  PubMed, Semantic Scholar, ChEMBL, and the local retrieval index (rag_search).
+  Prefer ChEMBL for structured compound/bioactivity facts and literature tools
+  for mechanism and clinical context. Always cite sources (paper ID/DOI or
+  ChEMBL ID). When the caller has requested structured entity extraction,
+  your final answer's JSON must conform exactly to the schema you've been
+  given — gather evidence with your tools first, then answer.
+
+allowed_tools:
+  - pubmed_search
+  - semantic_scholar_search
+  - chembl_lookup
+  - rag_search
+
+collection_name: drug_discovery
+chunk_size: 800
+chunk_overlap: 120
+top_k: 6
+
+# Applied via output_config.format on the /extract route (not a callable
+# tool) — Claude still uses allowed_tools above to gather evidence, then the
+# final answer is constrained to this schema. additionalProperties: false is
+# required on every object per the structured-outputs API.
+extraction_schema:
+  type: object
+  properties:
+    targets:
+      type: array
+      items:
+        type: object
+        properties:
+          name: {type: string}
+          gene_symbol: {type: string}
+          evidence: {type: string}
+        required: [name]
+        additionalProperties: false
+    compounds:
+      type: array
+      items:
+        type: object
+        properties:
+          name: {type: string}
+          chembl_id: {type: string}
+          mechanism_of_action: {type: string}
+        required: [name]
+        additionalProperties: false
+    trial_phases:
+      type: array
+      items:
+        type: object
+        properties:
+          compound: {type: string}
+          phase: {type: string}
+          indication: {type: string}
+        required: [compound, phase]
+        additionalProperties: false
+  required: [targets, compounds, trial_phases]
+  additionalProperties: false
