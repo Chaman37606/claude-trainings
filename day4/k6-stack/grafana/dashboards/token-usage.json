@@ -1,0 +1,157 @@
+{
+  "uid": "claude-token-usage",
+  "title": "Claude Token Usage - Load Testing",
+  "timezone": "browser",
+  "schemaVersion": 39,
+  "version": 1,
+  "refresh": "",
+  "time": { "from": "now-1d", "to": "now" },
+  "panels": [
+    {
+      "id": 1,
+      "title": "Total Tokens",
+      "type": "stat",
+      "gridPos": { "h": 4, "w": 4, "x": 0, "y": 0 },
+      "fieldConfig": { "defaults": { "unit": "short", "color": { "mode": "thresholds" } }, "overrides": [] },
+      "targets": [
+        {
+          "refId": "A",
+          "rawQuery": true,
+          "query": "SELECT sum(\"total_tokens\") FROM \"token_usage\" WHERE $timeFilter",
+          "resultFormat": "time_series",
+          "alias": "Total"
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "title": "Cache Read Tokens",
+      "type": "stat",
+      "gridPos": { "h": 4, "w": 4, "x": 4, "y": 0 },
+      "fieldConfig": { "defaults": { "unit": "short", "color": { "mode": "fixed", "fixedColor": "green" } }, "overrides": [] },
+      "targets": [
+        {
+          "refId": "A",
+          "rawQuery": true,
+          "query": "SELECT sum(\"cache_read_input_tokens\") FROM \"token_usage\" WHERE $timeFilter",
+          "resultFormat": "time_series",
+          "alias": "Cache read"
+        }
+      ]
+    },
+    {
+      "id": 3,
+      "title": "Cache Creation Tokens",
+      "type": "stat",
+      "gridPos": { "h": 4, "w": 4, "x": 8, "y": 0 },
+      "fieldConfig": { "defaults": { "unit": "short", "color": { "mode": "fixed", "fixedColor": "orange" } }, "overrides": [] },
+      "targets": [
+        {
+          "refId": "A",
+          "rawQuery": true,
+          "query": "SELECT sum(\"cache_creation_input_tokens\") FROM \"token_usage\" WHERE $timeFilter",
+          "resultFormat": "time_series",
+          "alias": "Cache creation"
+        }
+      ]
+    },
+    {
+      "id": 4,
+      "title": "Output Tokens",
+      "type": "stat",
+      "gridPos": { "h": 4, "w": 4, "x": 12, "y": 0 },
+      "fieldConfig": { "defaults": { "unit": "short", "color": { "mode": "fixed", "fixedColor": "blue" } }, "overrides": [] },
+      "targets": [
+        {
+          "refId": "A",
+          "rawQuery": true,
+          "query": "SELECT sum(\"output_tokens\") FROM \"token_usage\" WHERE $timeFilter",
+          "resultFormat": "time_series",
+          "alias": "Output"
+        }
+      ]
+    },
+    {
+      "id": 5,
+      "title": "Fresh Input Tokens",
+      "type": "stat",
+      "gridPos": { "h": 4, "w": 4, "x": 16, "y": 0 },
+      "fieldConfig": { "defaults": { "unit": "short", "color": { "mode": "fixed", "fixedColor": "purple" } }, "overrides": [] },
+      "targets": [
+        {
+          "refId": "A",
+          "rawQuery": true,
+          "query": "SELECT sum(\"input_tokens\") FROM \"token_usage\" WHERE $timeFilter",
+          "resultFormat": "time_series",
+          "alias": "Fresh input"
+        }
+      ]
+    },
+    {
+      "id": 6,
+      "title": "Thinking Tokens",
+      "type": "stat",
+      "gridPos": { "h": 4, "w": 4, "x": 20, "y": 0 },
+      "fieldConfig": { "defaults": { "unit": "short", "color": { "mode": "fixed", "fixedColor": "yellow" } }, "overrides": [] },
+      "targets": [
+        {
+          "refId": "A",
+          "rawQuery": true,
+          "query": "SELECT sum(\"thinking_tokens\") FROM \"token_usage\" WHERE $timeFilter",
+          "resultFormat": "time_series",
+          "alias": "Thinking"
+        }
+      ]
+    },
+    {
+      "id": 7,
+      "title": "Tokens per turn (by category)",
+      "type": "timeseries",
+      "gridPos": { "h": 9, "w": 16, "x": 0, "y": 4 },
+      "fieldConfig": { "defaults": { "unit": "short", "custom": { "fillOpacity": 40, "stacking": { "mode": "normal" } } }, "overrides": [] },
+      "targets": [
+        {
+          "refId": "A",
+          "rawQuery": true,
+          "query": "SELECT \"cache_read_input_tokens\", \"cache_creation_input_tokens\", \"output_tokens\", \"input_tokens\" FROM \"token_usage\" WHERE $timeFilter",
+          "resultFormat": "time_series"
+        }
+      ]
+    },
+    {
+      "id": 8,
+      "title": "Token breakdown by category",
+      "type": "piechart",
+      "gridPos": { "h": 9, "w": 8, "x": 16, "y": 4 },
+      "fieldConfig": { "defaults": { "unit": "short" }, "overrides": [] },
+      "options": {
+        "reduceOptions": { "calcs": ["sum"] },
+        "legend": { "displayMode": "table", "placement": "right", "values": ["value", "percent"] }
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "rawQuery": true,
+          "query": "SELECT sum(\"cache_read_input_tokens\") AS \"Cache read\", sum(\"cache_creation_input_tokens\") AS \"Cache creation\", sum(\"output_tokens\") AS \"Output\", sum(\"input_tokens\") AS \"Fresh input\" FROM \"token_usage\" WHERE $timeFilter",
+          "resultFormat": "time_series"
+        }
+      ]
+    },
+    {
+      "id": 9,
+      "title": "Total tokens per turn",
+      "type": "timeseries",
+      "gridPos": { "h": 8, "w": 24, "x": 0, "y": 13 },
+      "fieldConfig": { "defaults": { "unit": "short" }, "overrides": [] },
+      "targets": [
+        {
+          "refId": "A",
+          "rawQuery": true,
+          "query": "SELECT \"total_tokens\" FROM \"token_usage\" WHERE $timeFilter",
+          "resultFormat": "time_series",
+          "alias": "total_tokens per turn"
+        }
+      ]
+    }
+  ]
+}

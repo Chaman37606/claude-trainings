@@ -1,0 +1,38 @@
+{
+  "agents/backend/run_agent.sh": {
+    "mtime": 1789794657.747295,
+    "seen": 1789795476.2176466,
+    "ast_hash": "279e414540a556944091e0c60fd9a258",
+    "semantic_hash": "279e414540a556944091e0c60fd9a258"
+  },
+  "backend-agent.js": {
+    "mtime": 1789794817.3947997,
+    "seen": 1789795476.2176542,
+    "ast_hash": "b2a73239a0fb4e74474fab1c9c982b45",
+    "semantic_hash": "b2a73239a0fb4e74474fab1c9c982b45"
+  },
+  "mcp_client.js": {
+    "mtime": 1789794868.2020495,
+    "seen": 1789795476.217657,
+    "ast_hash": "636330d17cfef79b7a28233ae741c68a",
+    "semantic_hash": "636330d17cfef79b7a28233ae741c68a"
+  },
+  "package.json": {
+    "mtime": 1789794796.8906782,
+    "seen": 1789795476.2176592,
+    "ast_hash": "4d1d382d2b050dac2adc5827561b092b",
+    "semantic_hash": "4d1d382d2b050dac2adc5827561b092b"
+  },
+  "public/app.js": {
+    "mtime": 1789794839.0720427,
+    "seen": 1789795476.2176607,
+    "ast_hash": "45f7770216280c3ec7f6bbb66d250180",
+    "semantic_hash": "45f7770216280c3ec7f6bbb66d250180"
+  },
+  "server.js": {
+    "mtime": 1789794807.6567922,
+    "seen": 1789795476.2176619,
+    "ast_hash": "899a3069507d54c36354574bd15d1bdf",
+    "semantic_hash": "899a3069507d54c36354574bd15d1bdf"
+  }
+}

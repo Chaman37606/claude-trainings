@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Obsidian Vault Explorer - SIP Calculator</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    
+    body {
+      font-family: 'Segoe UI', Roboto, sans-serif;
+      background: #0d1117;
+      color: #c9d1d9;
+      min-height: 100vh;
+    }
+
+    .header {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      padding: 40px 20px;
+      text-align: center;
+      color: white;
+    }
+
+    .header h1 { font-size: 2.5em; margin-bottom: 10px; }
+    .header p { font-size: 1.1em; opacity: 0.9; }
+
+    .container { max-width: 1400px; margin: 40px auto; padding: 0 20px; }
+
+    .section { margin-bottom: 50px; }
+    .section h2 { 
+      color: #58a6ff; 
+      font-size: 1.8em;
+      margin-bottom: 25px;
+      padding-bottom: 10px;
+      border-bottom: 2px solid #30363d;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 20px;
+    }
+
+    .card {
+      background: #161b22;
+      border: 1px solid #30363d;
+      border-radius: 8px;
+      padding: 20px;
+      transition: all 0.3s ease;
+    }
+
+    .card:hover {
+      background: #0d1117;
+      border-color: #58a6ff;
+      transform: translateY(-3px);
+    }
+
+    .card h3 {
+      color: #58a6ff;
+      margin-bottom: 12px;
+      font-size: 1.2em;
+    }
+
+    .badge {
+      display: inline-block;
+      background: #1f6feb;
+      color: white;
+      padding: 4px 10px;
+      border-radius: 16px;
+      font-size: 0.85em;
+      margin-bottom: 12px;
+    }
+
+    .member-list {
+      list-style: none;
+      font-size: 0.95em;
+    }
+
+    .member-list li {
+      padding: 6px 0;
+      border-bottom: 1px solid #30363d;
+      color: #8b949e;
+    }
+
+    .member-list li:last-child { border-bottom: none; }
+
+    .tag {
+      display: inline-block;
+      background: #238636;
+      color: white;
+      padding: 2px 8px;
+      border-radius: 12px;
+      font-size: 0.75em;
+      margin-left: 8px;
+    }
+
+    .files-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+      gap: 15px;
+    }
+
+    .file-card {
+      background: #161b22;
+      border: 1px solid #30363d;
+      padding: 15px;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      text-align: center;
+    }
+
+    .file-card:hover {
+      background: #0d1117;
+      border-color: #58a6ff;
+    }
+
+    .file-icon { font-size: 1.8em; margin-bottom: 8px; }
+    .file-name { font-weight: 600; color: #58a6ff; word-break: break-word; }
+    .file-type { font-size: 0.85em; color: #8b949e; margin-top: 5px; }
+
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+      gap: 15px;
+      margin-top: 30px;
+    }
+
+    .stat-box {
+      background: #161b22;
+      border: 1px solid #30363d;
+      padding: 20px;
+      border-radius: 8px;
+      text-align: center;
+    }
+
+    .stat-number {
+      font-size: 2.5em;
+      font-weight: bold;
+      color: #58a6ff;
+    }
+
+    .stat-label { 
+      color: #8b949e; 
+      font-size: 0.95em;
+      margin-top: 8px;
+    }
+
+    .instructions {
+      background: #161b22;
+      border-left: 4px solid #58a6ff;
+      padding: 20px;
+      border-radius: 6px;
+      margin-top: 30px;
+    }
+
+    .instructions h3 { color: #58a6ff; margin-bottom: 12px; }
+    .instructions p { color: #8b949e; line-height: 1.6; margin-bottom: 10px; }
+    .instructions code {
+      background: #0d1117;
+      padding: 2px 6px;
+      border-radius: 3px;
+      font-family: 'Courier New', monospace;
+      color: #79c0ff;
+    }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <h1>🧠 Obsidian Vault Explorer</h1>
+    <p>Interactive Knowledge Graph - SIP Calculator Project</p>
+  </div>
+
+  <div class="container">
+    <!-- Communities Section -->
+    <div class="section">
+      <h2>🏘️ Architecture Communities (8)</h2>
+      <div class="grid">
+        <div class="card">
+          <h3>🔵 API & Calculation</h3>
+          <span class="badge">8 nodes</span>
+          <ul class="member-list">
+            <li>server.js <span class="tag">main</span></li>
+            <li>calculateSIP()</li>
+            <li>express, cors</li>
+            <li>app, path, mcp</li>
+          </ul>
+        </div>
+
+        <div class="card">
+          <h3>🟠 Backend Agent</h3>
+          <span class="badge">7 nodes</span>
+          <ul class="member-list">
+            <li>backend-agent.js <span class="tag">main</span></li>
+            <li>calculateSIPWithAgent()</li>
+            <li>fetchAndAnalyzeNAV()</li>
+            <li>Anthropic SDK</li>
+          </ul>
+        </div>
+
+        <div class="card">
+          <h3>🔴 Frontend</h3>
+          <span class="badge">6 nodes</span>
+          <ul class="member-list">
+            <li>package.json <span class="tag">config</span></li>
+            <li>main, name, version</li>
+            <li>express, cors deps</li>
+          </ul>
+        </div>
+
+        <div class="card">
+          <h3>🟦 Market Data Integration</h3>
+          <span class="badge">5 nodes</span>
+          <ul class="member-list">
+            <li>mcp_client.js <span class="tag">main</span></li>
+            <li>fetch()</li>
+            <li>fetchNav(), fetchMarketRate()</li>
+            <li>node-fetch</li>
+          </ul>
+        </div>
+
+        <div class="card">
+          <h3>🟢 Dependencies</h3>
+          <span class="badge">5 nodes</span>
+          <ul class="member-list">
+            <li>express</li>
+            <li>cors</li>
+            <li>node-fetch</li>
+            <li>@anthropic-ai/sdk</li>
+          </ul>
+        </div>
+
+        <div class="card">
+          <h3>🟡 Scripts & Config</h3>
+          <span class="badge">3 nodes</span>
+          <ul class="member-list">
+            <li>scripts field</li>
+            <li>start, backend-agent</li>
+            <li>run_agent.sh</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <!-- Files Section -->
+    <div class="section">
+      <h2>📚 Generated Documentation (46 files)</h2>
+      <div class="files-grid">
+        <div class="file-card">
+          <div class="file-icon">🎨</div>
+          <div class="file-name">graph.canvas</div>
+          <div class="file-type">Visual Graph</div>
+        </div>
+        <div class="file-card">
+          <div class="file-icon">📄</div>
+          <div class="file-name">server.js.md</div>
+          <div class="file-type">API Server</div>
+        </div>
+        <div class="file-card">
+          <div class="file-icon">📄</div>
+          <div class="file-name">backend-agent.js.md</div>
+          <div class="file-type">AI Agent</div>
+        </div>
+        <div class="file-card">
+          <div class="file-icon">📄</div>
+          <div class="file-name">mcp_client.js.md</div>
+          <div class="file-type">Data Fetching</div>
+        </div>
+        <div class="file-card">
+          <div class="file-icon">📄</div>
+          <div class="file-name">package.json.md</div>
+          <div class="file-type">Configuration</div>
+        </div>
+        <div class="file-card">
+          <div class="file-icon">🏘️</div>
+          <div class="file-name">_COMMUNITY_*.md</div>
+          <div class="file-type">8 Community Docs</div>
+        </div>
+        <div class="file-card">
+          <div class="file-icon">⚙️</div>
+          <div class="file-name">calculateSIP*.md</div>
+          <div class="file-type">Functions</div>
+        </div>
+        <div class="file-card">
+          <div class="file-icon">🌐</div>
+          <div class="file-name">fetch*.md</div>
+          <div class="file-type">API Calls</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Stats Section -->
+    <div class="stats">
+      <div class="stat-box">
+        <div class="stat-number">46</div>
+        <div class="stat-label">Markdown Notes</div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-number">38</div>
+        <div class="stat-label">Nodes Documented</div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-number">8</div>
+        <div class="stat-label">Communities</div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-number">40</div>
+        <div class="stat-label">Edges/Links</div>
+      </div>
+    </div>
+
+    <!-- Instructions -->
+    <div class="instructions">
+      <h3>📖 How to Use Your Obsidian Vault</h3>
+      
+      <p><strong>Option 1: Open in Obsidian App</strong></p>
+      <ol style="margin-left: 20px; color: #8b949e;">
+        <li>Download & launch <a href="https://obsidian.md" style="color: #58a6ff;">Obsidian</a></li>
+        <li>Click "Open folder as vault"</li>
+        <li>Select: <code>/home/labuser/day4/graphify-out/obsidian/</code></li>
+        <li>Explore with bidirectional links, backlinks panel, graph view</li>
+      </ol>
+
+      <p style="margin-top: 20px;"><strong>Option 2: View as Static Files</strong></p>
+      <p>All markdown files are in: <code>/home/labuser/day4/graphify-out/obsidian/</code></p>
+      <p>Open any .md file in your text editor to view content</p>
+
+      <p style="margin-top: 20px;"><strong>Key Features</strong></p>
+      <ul style="margin-left: 20px; color: #8b949e;">
+        <li>✨ All notes are cross-linked with <code>[[brackets]]</code></li>
+        <li>📊 Visual graph.canvas shows node relationships</li>
+        <li>🔗 Backlinks panel shows what references each note</li>
+        <li>🏘️ Community files organize by architecture layer</li>
+      </ul>
+    </div>
+  </div>
+</body>
+</html>

@@ -1,0 +1,98 @@
+{
+  "uid": "k6-load-test-overview",
+  "title": "k6 Load Test Overview",
+  "timezone": "browser",
+  "schemaVersion": 39,
+  "version": 1,
+  "refresh": "5s",
+  "time": { "from": "now-15m", "to": "now" },
+  "panels": [
+    {
+      "id": 1,
+      "title": "Virtual Users (VUs)",
+      "type": "timeseries",
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 0 },
+      "fieldConfig": { "defaults": { "unit": "short" }, "overrides": [] },
+      "targets": [
+        {
+          "refId": "A",
+          "rawQuery": true,
+          "query": "SELECT mean(\"value\") FROM \"vus\" WHERE $timeFilter GROUP BY time($__interval) fill(null)",
+          "resultFormat": "time_series",
+          "alias": "VUs"
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "title": "Request rate",
+      "type": "timeseries",
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 0 },
+      "fieldConfig": { "defaults": { "unit": "reqps" }, "overrides": [] },
+      "targets": [
+        {
+          "refId": "A",
+          "rawQuery": true,
+          "query": "SELECT non_negative_derivative(sum(\"value\"), 1s) FROM \"http_reqs\" WHERE $timeFilter GROUP BY time($__interval) fill(0)",
+          "resultFormat": "time_series",
+          "alias": "requests/s"
+        }
+      ]
+    },
+    {
+      "id": 3,
+      "title": "HTTP error rate",
+      "type": "timeseries",
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 8 },
+      "fieldConfig": { "defaults": { "unit": "percent", "max": 100, "min": 0 }, "overrides": [] },
+      "targets": [
+        {
+          "refId": "A",
+          "rawQuery": true,
+          "query": "SELECT mean(\"value\") * 100 FROM \"http_req_failed\" WHERE $timeFilter GROUP BY time($__interval) fill(null)",
+          "resultFormat": "time_series",
+          "alias": "error rate %"
+        }
+      ]
+    },
+    {
+      "id": 4,
+      "title": "HTTP request duration (avg / p95)",
+      "type": "timeseries",
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 8 },
+      "fieldConfig": { "defaults": { "unit": "ms" }, "overrides": [] },
+      "targets": [
+        {
+          "refId": "A",
+          "rawQuery": true,
+          "query": "SELECT mean(\"value\") FROM \"http_req_duration\" WHERE $timeFilter GROUP BY time($__interval) fill(null)",
+          "resultFormat": "time_series",
+          "alias": "avg"
+        },
+        {
+          "refId": "B",
+          "rawQuery": true,
+          "query": "SELECT percentile(\"value\", 95) FROM \"http_req_duration\" WHERE $timeFilter GROUP BY time($__interval) fill(null)",
+          "resultFormat": "time_series",
+          "alias": "p95"
+        }
+      ]
+    },
+    {
+      "id": 5,
+      "title": "Requests by endpoint",
+      "type": "timeseries",
+      "gridPos": { "h": 8, "w": 24, "x": 0, "y": 16 },
+      "fieldConfig": { "defaults": { "unit": "reqps" }, "overrides": [] },
+      "targets": [
+        {
+          "refId": "A",
+          "rawQuery": true,
+          "query": "SELECT non_negative_derivative(sum(\"value\"), 1s) FROM \"http_reqs\" WHERE $timeFilter GROUP BY time($__interval), \"name\" fill(0)",
+          "resultFormat": "time_series",
+          "alias": "$tag_name"
+        }
+      ]
+    }
+  ]
+}
