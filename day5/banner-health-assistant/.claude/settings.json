@@ -1,0 +1,10 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(pip3 show *)",
+      "Bash(git ls-tree *)",
+      "Bash(pip3 list *)",
+      "Bash(apt-cache *)"
+    ]
+  }
+}
