@@ -130,6 +130,34 @@
     return '';
   }
 
+  // "prior_visit" -> "Prior Visit" (CSS still upper-cases it for the badge,
+  // this just controls word breaks/spacing instead of one glued-together word).
+  function categoryLabel(category) {
+    const key = String(category || 'other');
+    return key
+      .split(/[_\s]+/)
+      .filter(Boolean)
+      .map((w) => w.charAt(0).toUpperCase() + w.slice(1))
+      .join(' ');
+  }
+
+  function formatRelevance(score) {
+    if (score === undefined || score === null || isNaN(Number(score))) return '';
+    return Number(score).toFixed(1);
+  }
+
+  // Classifies an item's urgency from its "reason" text so the summary card's
+  // accent color reflects clinical priority (active+recent > active > stable),
+  // not just its category — a stable/resolved condition shouldn't look as
+  // alarming as a newly active one just because both are "condition" rows.
+  function urgencyClass(reason) {
+    const r = String(reason || '').toLowerCase();
+    if (r.includes('updated recently') || r.includes('recent')) return 'urgency-urgent';
+    if (r.includes('active')) return 'urgency-active';
+    if (r.includes('stable') || r.includes('historical') || r.includes('resolved')) return 'urgency-stable';
+    return '';
+  }
+
   // ---------------------------------------------------------------------
   // Patients
   // ---------------------------------------------------------------------
@@ -244,21 +272,28 @@
       return;
     }
 
+    const maxScore = Math.max(1, ...items.map((it) => Number(it.relevance_score) || 0));
+
     items.forEach((item) => {
       const li = document.createElement('li');
-      li.className = 'summary-item';
+      const catCls = categoryClass(item.category);
+      const urgCls = urgencyClass(item.reason);
+      li.className = `summary-item ${urgCls}`;
       li.id = `summary-item-${item.id}`;
 
-      const catCls = categoryClass(item.category);
+      const barPct = Math.max(4, Math.round(((Number(item.relevance_score) || 0) / maxScore) * 100));
       li.innerHTML = `
         <div class="summary-item-top">
           <div class="summary-item-desc">${escapeHtml(item.description)}</div>
           <div class="summary-item-date">${escapeHtml(formatDate(item.date))}</div>
         </div>
-        <span class="category-badge ${catCls}">${escapeHtml(item.category || 'other')}</span>
-        ${item.relevance_score !== undefined && item.relevance_score !== null
-          ? `<span class="relevance-pip">relevance: ${escapeHtml(item.relevance_score)}</span>`
-          : ''}
+        <div class="summary-item-meta">
+          <span class="category-badge ${catCls}">${escapeHtml(categoryLabel(item.category))}</span>
+          <div class="relevance-meter" title="Relevance score: ${escapeHtml(formatRelevance(item.relevance_score))}">
+            <div class="relevance-meter-track"><div class="relevance-meter-fill" style="width:${barPct}%"></div></div>
+            <span class="relevance-meter-value">${escapeHtml(formatRelevance(item.relevance_score))}</span>
+          </div>
+        </div>
         ${item.reason ? `<div class="summary-item-reason">${escapeHtml(item.reason)}</div>` : ''}
       `;
       el.summaryList.appendChild(li);
@@ -298,7 +333,7 @@
       li.innerHTML = `
         <div class="timeline-item-date">${escapeHtml(formatDate(ev.date))}</div>
         <div class="timeline-item-body">
-          <span class="category-badge ${catCls}">${escapeHtml(ev.category || ev.type || 'other')}</span>
+          <span class="category-badge ${catCls}">${escapeHtml(categoryLabel(ev.category || ev.type))}</span>
           <div class="timeline-item-desc">${escapeHtml(ev.description)}</div>
         </div>
       `;
@@ -548,12 +583,6 @@
     // no-op: script is loaded at end of body, but kept for safety if moved.
   });
 
-  loadPatients().then(() => {
-    const params = new URLSearchParams(location.search);
-    const p = params.get('__debug_patient');
-    if (p) selectPatient(Number(p)).then(() => {
-      if (params.get('__debug_timeline')) el.timelineToggleBtn.click();
-    });
-  });
+  loadPatients();
   loadAudit(); // show global audit trail before any patient is selected
 })();
